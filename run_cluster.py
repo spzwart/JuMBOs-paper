@@ -9,7 +9,10 @@ from amuse.community.petar.interface import Petar
 from amuse.community.fractalcluster.interface import new_fractal_cluster_model
 
 from matplotlib import pyplot as plt
-from make_jumbos import make_outer_planetary_systems, make_isolated_jumbos
+from make_jumbos import make_outer_planetary_systems
+from make_jumbos import make_isolated_jumbos
+from make_jumbos import make_arXiv2310_06016
+from make_jumbos import make_jumbo_as_planetmoon_pair
 
 def ZAMS_radius(mass):
     log_mass = numpy.log10(mass.value_in(units.MSun))
@@ -29,9 +32,9 @@ def merge_two_stars(bodies, particles_in_encounter):
     new_particle.position = com_pos
     new_particle.velocity = com_vel
     new_particle.radius = particles_in_encounter.radius.sum()
-    if "JuMBOs" in bodies.name:
-        print("Merge with JuMBOs")
-        new_particle.name = "JuMBOs"
+    if "jumbos" in bodies.name:
+        print("Merge with jumbos")
+        new_particle.name = "jumbos"
     else:
         print("Merge two stars")
         new_particle.name = "star"
@@ -82,7 +85,7 @@ def resolve_supernova(supernova_detection, bodies, time):
 
         print('Resolved', Nsn, 'supernova(e)')
 
-def make_initial_cluster(Nstars, Njumbos, Rvir, Fd):
+def make_initial_cluster(Nstars, Njumbos, Rvir, Fd, jumbo_model):
     
     N = Nstars + Njumbos
 
@@ -91,7 +94,7 @@ def make_initial_cluster(Nstars, Njumbos, Rvir, Fd):
     masses = new_kroupa_mass_distribution(N, mass_min=Mmin, mass_max=Mmax)
     
     Mtot_init = masses.sum()
-    converter=nbody_system.nbody_to_si(1|units.Myr, Rvir)
+    converter=nbody_system.nbody_to_si(Mtot_init, 1|units.Myr)
     if Fd>0:
         bodies = new_fractal_cluster_model(N, fractal_dimension=1.6, convert_nbody=converter)
     else:
@@ -99,10 +102,11 @@ def make_initial_cluster(Nstars, Njumbos, Rvir, Fd):
     bodies.mass = masses
     bodies.name = "star"
     bodies.radius = ZAMS_radius(bodies.mass)
-    if Njumbos>0:
+    if jumbo_model=="freefloaters":
         JuMBOs = bodies.random_sample(Njumbos)
         JuMBOs.mass = 20 | units.MJupiter
-        JuMBOs.name = "JuMBOs"
+        JuMBOs.name = "jumbos"
+        JuMBOs.type = "planet"
         JuMBOs.radius = 1 | units.RJupiter
         bodies.scale_to_standard(convert_nbody=converter)
         bodies.move_to_center()
@@ -111,14 +115,32 @@ def make_initial_cluster(Nstars, Njumbos, Rvir, Fd):
     else:
         bodies.scale_to_standard(convert_nbody=converter)
         bodies.move_to_center()
-        host_stars = bodies[bodies.mass<=5|units.MSun]
-        host_stars = host_stars[host_stars.mass>=0.2|units.MSun]
+        bodies = bodies.sorted_by_attribute('mass')
+        #print(bodies.mass.in_(units.MSun))
+        for bi in range(len(bodies)):
+            if bodies[bi].mass>1|units.MSun:
+                break
+        print(bodies[bi].mass.in_(units.MSun))
+        print(bodies[bi-150].mass.in_(units.MSun))
+        print(bodies[bi+150].mass.in_(units.MSun))
+        #host_stars = bodies[bodies.mass<=3|units.MSun]
+        #host_stars = host_stars[host_stars.mass>=0.6|units.MSun]
+        host_stars = bodies[bi-int(Njumbos/2):bi+int(Njumbos/2)]
         host_stars.name = "host"
         nhost_stars = len(host_stars)
-        jumbos = make_outer_planetary_systems(bodies)
-
+        if jumbo_model=="circum_stellar":
+            jumbos = make_arXiv2310_06016(bodies)
+        elif jumbo_model=="planetmoon":
+            jumbos = make_jumbo_as_planetmoon_pair(bodies)
+        elif jumbo_model=="oligarchic":
+            jumbos = make_outer_planetary_systems(bodies)
+        else:
+            print(f"No Jumbo model selected: {jumbo_model}")
     #print(jumbos)
     bodies.add_particles(jumbos)
+    #from plot_cluster import print_planetary_orbits
+    #print_planetary_orbits(bodies.copy())
+    
     return bodies
         
 def  run_cluster(bodies, t_end, dt):
@@ -126,6 +148,8 @@ def  run_cluster(bodies, t_end, dt):
     stars = bodies[bodies.name=="star"]
     hosts = bodies[bodies.name=="host"]
     jumbos = bodies-stars-hosts
+    print(f"Stars N={len(stars)}, hosts N={len(hosts)}, Jumbos N={len(jumbos)}")
+
     """
     plt.scatter(stars.x.value_in(units.pc),  stars.y.value_in(units.pc), s=1, c='k') 
     plt.scatter(hosts.x.value_in(units.pc), hosts.y.value_in(units.pc), s=3, c='y')
@@ -134,7 +158,7 @@ def  run_cluster(bodies, t_end, dt):
     """
 
     converter=nbody_system.nbody_to_si(1|units.Myr, bodies.mass.sum())
-    gravity = ph4(converter, number_of_workers=8)
+    gravity = ph4(converter, number_of_workers=6)
     #gravity = Petar(converter, mode="gpu")#, number_of_workers=6)
     #gravity = Petar(converter, mode="gpu")#, number_of_workers=6)
     #gravity.parameters.timestep_parameter = 0.01
@@ -147,7 +171,7 @@ def  run_cluster(bodies, t_end, dt):
 
     index = 0
     filename = "jumbos_i{0:04}.amuse".format(index)
-    write_set_to_file(bodies.savepoint(0|units.Myr), filename, 'hdf5',
+    write_set_to_file(bodies, filename, 'amuse',
                           close_file=True, overwrite_file=True)
     E_init = gravity.kinetic_energy + gravity.potential_energy
     
@@ -188,8 +212,10 @@ def  run_cluster(bodies, t_end, dt):
             index += 1
             diag_time += dt_diag
             filename = "jumbos_i{0:04}.amuse".format(index)
-            write_set_to_file(bodies.savepoint(time), filename, 'hdf5',
+            write_set_to_file(bodies, filename, 'hdf5',
                               close_file=True, overwrite_file=False)
+            #write_set_to_file(bodies.savepoint(time), filename, 'hdf5',
+            #                  close_file=True, overwrite_file=False)
 
         
     gravity.stop()
@@ -206,8 +232,8 @@ def new_option_parser():
     result = OptionParser()
     result.add_option("--Nstars", dest="Nstars", type="int",default = 2500,
                       help="number of stars [%default]")
-    result.add_option("--NJuMBOs", dest="Njumbos", type="int",default = 500,
-                      help="number of JuMBOs [%default]")
+    result.add_option("--NJuMBOs", dest="Njumbos", type="int",default = 300,
+                      help="number of JuMBs [%default]")
     result.add_option("-F", dest="Fd", type="float", default = -1,
                       help="fractal dimension [%default]")
     result.add_option("--dt", unit=units.Myr,
@@ -219,11 +245,13 @@ def new_option_parser():
     result.add_option("-t", unit=units.Myr,
                       dest="t_end", type="float", default = 1.0 | units.Myr,
                       help="end time of the simulation [%default.value_in(units.Myr]")
+    result.add_option("--model", dest="jumbo_model", default = "classic",
+                      help="select jumbo model (freefloaters, circum_stellar, planetmoon, oligarchic) [%default]")
     return result
 
 if __name__ in ('__main__', '__plot__'):
     o, arguments  = new_option_parser().parse_args()
 
-    bodies = make_initial_cluster(o.Nstars, o.Njumbos, o.Rvir, o.Fd)
+    bodies = make_initial_cluster(o.Nstars, o.Njumbos, o.Rvir, o.Fd, o.jumbo_model)
     run_cluster(bodies, o.t_end, o.dt)
 

@@ -1,8 +1,15 @@
 import numpy
 from numpy import random
 from amuse.lab import *
-from amuse.ext.orbital_elements import generate_binaries
+from amuse.ext.orbital_elements import generate_binaries, new_binary_from_orbital_elements
 from amuse.ic import make_planets_oligarch
+
+def Hill_radius(Mstar, a, Mplanet):
+    return a * (Mplanet/(3.0*Mstar))**(1./3.)
+
+def sma_from_Hill_radius(Mstar, Mplanet, rH):
+    a = rH/((Mplanet/(3.0*Mstar))**(1./3.))
+    return a
 
 def new_rotation_matrix_from_euler_angles(phi, theta, chi):
     cosp=numpy.cos(phi)
@@ -25,7 +32,8 @@ def rotate(position, velocity, phi, theta, psi): # theta and phi in radians
            numpy.dot(matrix, velocity.value_in(Vunit)) | Vunit)
 
 
-def make_outer_planetary_systems(bodies): 
+def make_outer_planetary_systems(bodies):
+    print("Jumbos as Oligarchic outer circum-stellar planets.")
 
     host_stars = bodies[bodies.name=="host"]
     nhost_stars = len(host_stars)
@@ -72,19 +80,131 @@ def make_outer_planetary_systems(bodies):
         jumbos.add_particles(outer_planets)
     return jumbos
 
-def make_isolated_jumbos(bodies):
+def make_arXiv2310_06016(bodies):
+    print("Jumbos as outer circum-stellar planets following ArXiv 2310_06016.")
+    
+    host_stars = bodies[bodies.name=="host"]
+    nhost_stars = len(host_stars)
+    print(f"make ArXiv Jumbos N={nhost_stars}")
 
-    JuMBOs = bodies[bodies.name=="JuMBOs"]
+    jumbos = Particles()
+    for si in host_stars:
+        Mjumbos = 1.e-3 * si.mass
+        mprim = [si.mass.value_in(units.MSun), si.mass.value_in(units.MSun)] | units.MSun
+        msec = 1.e-3 * mprim
+        sma = [800, 1000] | units.au
+        ecc = numpy.sqrt(numpy.random.uniform(0, 0.02**2, 2))
+        inc = numpy.arccos(1-2*numpy.random.uniform(0,1, 2)) | units.rad
+        inc[1] = inc[0] + numpy.radians(numpy.random.uniform(-1,1, 1)) | units.rad
+        loan = numpy.random.uniform(0, 2*numpy.pi, 2) | units.rad
+        loan[1] = loan[0] + numpy.radians(numpy.random.uniform(-1, 1, 1)) | units.rad
+        aop = numpy.random.uniform(0, 2*numpy.pi, 2)| units.rad
+        aop[1] = aop[0] + numpy.radians(numpy.random.uniform(-1, 1, 1)) | units.rad
+        ta = numpy.random.uniform(0, 2*numpy.pi, 2)| units.rad
+
+        for bi in range(len(sma)):
+            binary = new_binary_from_orbital_elements(
+                mprim[bi], msec[bi], 
+                semimajor_axis=sma[bi],
+                eccentricity=ecc[bi],
+                true_anomaly=ta[bi],
+                inclination=inc[bi] ,
+                longitude_of_the_ascending_node=loan[bi] ,
+                argument_of_periapsis=aop[bi] ,
+                G=constants.G)
+            star = binary[0]
+            planet = binary[1]
+            planet.position -= star.position
+            planet.velocity -= star.velocity
+            planet.position += si.position
+            planet.velocity += si.velocity
+            planet.name = "jumbos"
+            planet.type = "planet"
+            planet.radius = 1 | units.RJupiter
+            jumbos.add_particle(planet)
+
+    return jumbos
+
+def make_jumbo_as_planetmoon_pair(bodies): 
+    print("Jumbos as outer circum-stellar planets-moon pair.")
+
+    host_stars = bodies[bodies.name=="host"]
+    nhost_stars = len(host_stars)
+    print(f"make ArXiv Jumbos N={nhost_stars}")
+
+    all_jumbos = Particles()
+
+    for si in host_stars:
+        q = numpy.sqrt(numpy.random.uniform(0.5**2, 1, 1))
+        #q = numpy.random.uniform(0.5, 1, 1)
+        Mjumbos = new_salpeter_mass_distribution(1,
+                                                 1|units.MJupiter,
+                                                 20|units.MJupiter, alpha=-1.2)
+        mprim = Mjumbos*q
+        msec = Mjumbos*(1-q) 
+        sma = numpy.random.uniform(10, 400, 1) | units.au
+        ecc = numpy.sqrt(numpy.random.uniform(0, 0.02**2, 1))
+        inc = numpy.arccos(1-2*numpy.random.uniform(0,1, 1)) | units.rad
+        loan = numpy.random.uniform(0, 2*numpy.pi, 1) | units.rad
+        aop = numpy.random.uniform(0, 2*numpy.pi, 1)| units.rad
+        ta = numpy.random.uniform(0, 2*numpy.pi, 1)| units.rad
+
+        jumbo = new_binary_from_orbital_elements(
+            mprim, msec, 
+            semimajor_axis=sma,
+            eccentricity=ecc,
+            true_anomaly=ta,
+            inclination=inc ,
+            longitude_of_the_ascending_node=loan ,
+            argument_of_periapsis=aop ,
+            G=constants.G)
+        jumbo.name = "jumbos"
+        jumbo.type = "planet"
+        jumbo.radius = 1 | units.RJupiter
+
+        mprim = si.mass
+        msec = jumbo.mass.sum()
+
+        rH = 3*sma
+        sma = sma_from_Hill_radius(si.mass, jumbo.mass.sum(), rH)
+        ecc = numpy.sqrt(numpy.random.uniform(0, 0.02**2, 1))
+        inc = numpy.arccos(1-2*numpy.random.uniform(0, 1, 1)) | units.rad
+        loan = numpy.random.uniform(0, 2*numpy.pi, 1) | units.rad
+        aop = numpy.random.uniform(0, 2*numpy.pi, 1)| units.rad
+        ta = numpy.random.uniform(0, 2*numpy.pi, 1)| units.rad
+        
+        binary = new_binary_from_orbital_elements(
+            mprim, msec, 
+            semimajor_axis=sma,
+            eccentricity=ecc,
+            true_anomaly=ta,
+            inclination=inc ,
+            longitude_of_the_ascending_node=loan ,
+            argument_of_periapsis=aop ,
+            G=constants.G)
+        binary[1].position -= binary[0].position
+        binary[1].velocity -= binary[0].velocity
+        jumbo.position += binary[1].position
+        jumbo.velocity += binary[1].velocity
+        jumbo.position += si.position
+        jumbo.velocity += si.velocity
+        all_jumbos.add_particles(jumbo)            
+    return all_jumbos
+
+def make_isolated_jumbos(bodies):
+    print("Jumbos as isolated free floating binary pair.")
+
+    JuMBOs = bodies[bodies.name=="jumbos"]
     njumbos = len(JuMBOs)
     print(f"N= {njumbos}")
-    q = numpy.random.uniform(0.5, 1, njumbos)
+    q = numpy.sqrt(numpy.random.uniform(0.5**2, 1, njumbos))
     mprim = JuMBOs.mass*q
     msec = JuMBOs.mass*(1-q)
     sma = numpy.random.uniform(10, 1000, njumbos) | units.au
     #sma = 10**numpy.random.uniform(1, 4, njumbos) | units.au
     #print(sorted(sma.in_(units.au)))
 
-    ecc = numpy.sqrt(numpy.random.uniform(0, numpy.sqrt(0.9), njumbos))
+    ecc = numpy.sqrt(numpy.random.uniform(0, 0.9**2, njumbos))
     inc = numpy.arccos(1-2*numpy.random.uniform(0,1, njumbos))| units.rad
     loan = numpy.random.uniform(0, 2*numpy.pi, njumbos)| units.rad
     aop = numpy.random.uniform(0, 2*numpy.pi, njumbos)| units.rad
@@ -104,11 +224,13 @@ def make_isolated_jumbos(bodies):
         G=constants.G)
     primaries.position += JuMBOs.position
     primaries.velocity += JuMBOs.velocity
-    primaries.name = "JuMBOs"
+    primaries.name = "jumbos"
+    primaries.type = "planet"
     primaries.radius = 1 | units.RJupiter
     secondaries.position += JuMBOs.position
     secondaries.velocity += JuMBOs.velocity
-    secondaries.name = "JuMBOs"
+    secondaries.name = "jumbos"
+    secondaries.type = "planet"
     secondaries.radius = 1 | units.RJupiter
 
     jumbos = Particles()
@@ -120,8 +242,10 @@ def make_isolated_jumbos(bodies):
 def new_option_parser():
     from amuse.units.optparse import OptionParser
     result = OptionParser()
-    result.add_option("--Njumbos", dest="Njumbos", type="int",default = 500,
+    result.add_option("--Njumbos", dest="Njumbos", type="int",default = 5,
                       help="number of JuMBOs [%default]")
+    result.add_option("--model", dest="jumbo_model", type="int",default = "classic",
+                      help="select jumbo model (freefloaters, circum_stellar, planetmoon, oligarchic) [%default]")
     result.add_option("-f", unit=units.Myr,
                       dest="filename", default = "stars.amuse",
                       help="end time of the simulation [%default.value_in(units.Myr]")
@@ -135,10 +259,28 @@ def new_option_parser():
 
 if __name__ in ('__main__', '__plot__'):
     o, arguments  = new_option_parser().parse_args()
-    stars = read_set_from_file(o.filename)
+
+    masses = new_kroupa_mass_distribution(N, mass_min=Mmin, mass_max=Mmax)
+    Rvir = 1|units.pc
+    converter=nbody_system.nbody_to_si(masses.sum(), Rvir)
+    stars = new_plummer_model(10, convert_nbody=converter)
+    bodies.name = "star"
+    
     if Njumbos>0:
         jumbos = make_isolated_jumbos(stars, o.Njumbos)
     else:
-        jumbos = make_outer_planetary_systems(stars)
+        jumbos = bodies.random_sample(o.Njumbos)
+        q = numpy.sqrt(numpy.random.uniform(0.5**2, 1, o.Njumbos))
+        #q = numpy.random.uniform(0.5, 1, o.Njumbos)
+        jumbo.mass = new_salpeter_mass_distribution(o.Njumbos,
+                                                 1|units.MJupiter,
+                                                 20|units.MJupiter, alpha=-1.2)
+        jumbos.name = "JuMBOs"
+        jumbos.radius = 1 | units.RJupiter
+        if o.arxive==0:        
+            jumbos = make_outer_planetary_systems(stars)
+        else:
+            jumbos = make_arXiv2310_06016(stars)
+    
     stars.add_particles(jumbos)
     write_set_to_file(stars, o.outfile, "amuse", close_file=True)
