@@ -1,0 +1,167 @@
+This is BibTeX, Version 0.99d (TeX Live 2022/dev/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: jumbos.aux
+The style file: /home/spz/Latex/lib/bib/aa.bst
+Reallocated bib_list (elt_size=4) to 40 items from 20.
+Reallocated bib_file (elt_size=8) to 40 items from 20.
+Reallocated s_preamble (elt_size=4) to 40 items from 20.
+Reallocated bib_list (elt_size=4) to 60 items from 40.
+Reallocated bib_file (elt_size=8) to 60 items from 40.
+Reallocated s_preamble (elt_size=4) to 60 items from 40.
+Reallocated bib_list (elt_size=4) to 80 items from 60.
+Reallocated bib_file (elt_size=8) to 80 items from 60.
+Reallocated s_preamble (elt_size=4) to 80 items from 60.
+This database file appears more than once: /home/spz/Latex/lib/bib/software.bib
+---line 53 of file jumbos.aux
+ : \bibdata{/home/spz/Latex/lib/bib/PhDThesis,/home/spz/Latex/lib/bib/Other,/home/spz/Latex/lib/bib/url,/home/spz/Latex/lib/bib/software,/home/spz/Latex/lib/bib/ascl,/home/spz/Latex/lib/bib/A,/home/spz/Latex/lib/bib/B,/home/spz/Latex/lib/bib/C,/home/spz/Latex/lib/bib/D,/home/spz/Latex/lib/bib/E,/home/spz/Latex/lib/bib/F,/home/spz/Latex/lib/bib/G,/home/spz/Latex/lib/bib/H,/home/spz/Latex/lib/bib/I,/home/spz/Latex/lib/bib/J,/home/spz/Latex/lib/bib/K,/home/spz/Latex/lib/bib/L,/home/spz/Latex/lib/bib/M,/home/spz/Latex/lib/bib/N,/home/spz/Latex/lib/bib/O,/home/spz/Latex/lib/bib/P,/home/spz/Latex/lib/bib/Q,/home/spz/Latex/lib/bib/R,/home/spz/Latex/lib/bib/S,/home/spz/Latex/lib/bib/T,/home/spz/Latex/lib/bib/U,/home/spz/Latex/lib/bib/V,/home/spz/Latex/lib/bib/W,/home/spz/Latex/lib/bib/X,/home/spz/Latex/lib/bib/Y.bib,/home/spz/Latex/lib/bib/Z.bib,/home/spz/Latex/lib/bib/general_relativity,/home/spz/Latex/lib/bib/spz2023,/home/spz/Latex/lib/bib/spz2022,/home/spz/Latex/lib/bib/spz2021,/home/spz/Latex/lib/bib/spz2020,/home/spz/Latex/lib/bib/spz2019,/home/spz/Latex/lib/bib/spz2018,/home/spz/Latex/lib/bib/spz2017,/home/spz/Latex/lib/bib/spz2016,/home/spz/Latex/lib/bib/spz2015,/home/spz/Latex/lib/bib/spz2014,/home/spz/Latex/lib/bib/spz2013,/home/spz/Latex/lib/bib/spz2012,/home/spz/Latex/lib/bib/spz2011,/home/spz/Latex/lib/bib/spz2010,/home/spz/Latex/lib/bib/spz2009,/home/spz/Latex/lib/bib/spz2008,/home/spz/Latex/lib/bib/spz2007,/home/spz/Latex/lib/bib/spz2006,/home/spz/Latex/lib/bib/spz2005,/home/spz/Latex/lib/bib/spz2004,/home/spz/Latex/lib/bib/spz2003,/home/spz/Latex/lib/bib/spz2002,/home/spz/Latex/lib/bib/spz2001,/home/spz/Latex/lib/bib/spz2000,/home/spz/Latex/lib/bib/spz1999,/home/spz/Latex/lib/bib/spz1998,/home/spz/Latex/lib/bib/spz1997,/home/spz/Latex/lib/bib/spz1996,/home/spz/Latex/lib/bib/spz1995,/home/spz/Latex/lib/bib/spz1993,/home/spz/Latex/lib/bib/LIGO,/home/spz/Latex/lib/bib/data,/home/spz/Latex/lib/bib/software
+ :                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ,/home/spz/Latex/lib/bib/ASCL,/home/spz/Latex/lib/bib/spzLANL}
+I'm skipping whatever remains of this command
+Database file #1: /home/spz/Latex/lib/bib/PhDThesis.bib
+Database file #2: /home/spz/Latex/lib/bib/Other.bib
+Database file #3: /home/spz/Latex/lib/bib/url.bib
+Database file #4: /home/spz/Latex/lib/bib/software.bib
+Database file #5: /home/spz/Latex/lib/bib/ascl.bib
+Database file #6: /home/spz/Latex/lib/bib/A.bib
+Reallocated buffer (elt_size=1) to 40000 items from 20000.
+Reallocated sv_buffer (elt_size=1) to 40000 items from 20000.
+Reallocated ex_buf (elt_size=1) to 40000 items from 20000.
+Reallocated out_buf (elt_size=1) to 40000 items from 20000.
+Reallocated name_tok (elt_size=4) to 40000 items from 20000.
+Reallocated name_sep_char (elt_size=1) to 40000 items from 20000.
+Reallocated buffer (elt_size=1) to 60000 items from 40000.
+Reallocated sv_buffer (elt_size=1) to 60000 items from 40000.
+Reallocated ex_buf (elt_size=1) to 60000 items from 40000.
+Reallocated out_buf (elt_size=1) to 60000 items from 40000.
+Reallocated name_tok (elt_size=4) to 60000 items from 40000.
+Reallocated name_sep_char (elt_size=1) to 60000 items from 40000.
+Reallocated buffer (elt_size=1) to 80000 items from 60000.
+Reallocated sv_buffer (elt_size=1) to 80000 items from 60000.
+Reallocated ex_buf (elt_size=1) to 80000 items from 60000.
+Reallocated out_buf (elt_size=1) to 80000 items from 60000.
+Reallocated name_tok (elt_size=4) to 80000 items from 60000.
+Reallocated name_sep_char (elt_size=1) to 80000 items from 60000.
+Database file #7: /home/spz/Latex/lib/bib/B.bib
+Database file #8: /home/spz/Latex/lib/bib/C.bib
+Database file #9: /home/spz/Latex/lib/bib/D.bib
+Database file #10: /home/spz/Latex/lib/bib/E.bib
+Database file #11: /home/spz/Latex/lib/bib/F.bib
+Repeated entry---line 3181 of file /home/spz/Latex/lib/bib/F.bib
+ : @article{2019MNRAS.489.2280F
+ :                             ,
+I'm skipping whatever remains of this entry
+Database file #12: /home/spz/Latex/lib/bib/G.bib
+Database file #13: /home/spz/Latex/lib/bib/H.bib
+Repeated entry---line 4595 of file /home/spz/Latex/lib/bib/H.bib
+ : @article{2013MNRAS.433..867H
+ :                             ,
+I'm skipping whatever remains of this entry
+Database file #14: /home/spz/Latex/lib/bib/I.bib
+Database file #15: /home/spz/Latex/lib/bib/J.bib
+Database file #16: /home/spz/Latex/lib/bib/K.bib
+Database file #17: /home/spz/Latex/lib/bib/L.bib
+Database file #18: /home/spz/Latex/lib/bib/M.bib
+Database file #19: /home/spz/Latex/lib/bib/N.bib
+Database file #20: /home/spz/Latex/lib/bib/O.bib
+Database file #21: /home/spz/Latex/lib/bib/P.bib
+Database file #22: /home/spz/Latex/lib/bib/Q.bib
+Database file #23: /home/spz/Latex/lib/bib/R.bib
+Database file #24: /home/spz/Latex/lib/bib/S.bib
+Database file #25: /home/spz/Latex/lib/bib/T.bib
+Database file #26: /home/spz/Latex/lib/bib/U.bib
+Database file #27: /home/spz/Latex/lib/bib/V.bib
+Database file #28: /home/spz/Latex/lib/bib/W.bib
+Database file #29: /home/spz/Latex/lib/bib/X.bib
+Database file #30: /home/spz/Latex/lib/bib/Y.bib
+Database file #31: /home/spz/Latex/lib/bib/Z.bib
+Database file #32: /home/spz/Latex/lib/bib/general_relativity.bib
+Database file #33: /home/spz/Latex/lib/bib/spz2023.bib
+Database file #34: /home/spz/Latex/lib/bib/spz2022.bib
+Database file #35: /home/spz/Latex/lib/bib/spz2021.bib
+Database file #36: /home/spz/Latex/lib/bib/spz2020.bib
+Database file #37: /home/spz/Latex/lib/bib/spz2019.bib
+Database file #38: /home/spz/Latex/lib/bib/spz2018.bib
+Repeated entry---line 116 of file /home/spz/Latex/lib/bib/spz2018.bib
+ : @article{2019A&A...624A.120V
+ :                             ,
+I'm skipping whatever remains of this entry
+Database file #39: /home/spz/Latex/lib/bib/spz2017.bib
+Repeated entry---line 386 of file /home/spz/Latex/lib/bib/spz2017.bib
+ : @article{2017MNRAS.470.4337C
+ :                             ,
+I'm skipping whatever remains of this entry
+Database file #40: /home/spz/Latex/lib/bib/spz2016.bib
+Repeated entry---line 417 of file /home/spz/Latex/lib/bib/spz2016.bib
+ : @article{2016MNRAS.457..313P
+ :                             ,
+I'm skipping whatever remains of this entry
+Database file #41: /home/spz/Latex/lib/bib/spz2015.bib
+Database file #42: /home/spz/Latex/lib/bib/spz2014.bib
+Database file #43: /home/spz/Latex/lib/bib/spz2013.bib
+Database file #44: /home/spz/Latex/lib/bib/spz2012.bib
+Database file #45: /home/spz/Latex/lib/bib/spz2011.bib
+Database file #46: /home/spz/Latex/lib/bib/spz2010.bib
+Database file #47: /home/spz/Latex/lib/bib/spz2009.bib
+Database file #48: /home/spz/Latex/lib/bib/spz2008.bib
+Database file #49: /home/spz/Latex/lib/bib/spz2007.bib
+Database file #50: /home/spz/Latex/lib/bib/spz2006.bib
+Database file #51: /home/spz/Latex/lib/bib/spz2005.bib
+Database file #52: /home/spz/Latex/lib/bib/spz2004.bib
+Database file #53: /home/spz/Latex/lib/bib/spz2003.bib
+Database file #54: /home/spz/Latex/lib/bib/spz2002.bib
+Database file #55: /home/spz/Latex/lib/bib/spz2001.bib
+Database file #56: /home/spz/Latex/lib/bib/spz2000.bib
+Database file #57: /home/spz/Latex/lib/bib/spz1999.bib
+Database file #58: /home/spz/Latex/lib/bib/spz1998.bib
+Database file #59: /home/spz/Latex/lib/bib/spz1997.bib
+Database file #60: /home/spz/Latex/lib/bib/spz1996.bib
+Database file #61: /home/spz/Latex/lib/bib/spz1995.bib
+Database file #62: /home/spz/Latex/lib/bib/spz1993.bib
+Database file #63: /home/spz/Latex/lib/bib/LIGO.bib
+Database file #64: /home/spz/Latex/lib/bib/data.bib
+Warning--I didn't find a database entry for "Low1976"
+Warning--I didn't find a database entry for "Boyd2005"
+Warning--I didn't find a database entry for "Ford2001"
+Warning--I didn't find a database entry for ""
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+You've used 22 entries,
+            3039 wiz_defined-function locations,
+            904 strings with 12946 characters,
+and the built_in function-call counts, 14110 in all, are:
+= -- 1119
+> -- 1408
+< -- 7
++ -- 466
+- -- 444
+* -- 1266
+:= -- 2590
+add.period$ -- 22
+call.type$ -- 22
+change.case$ -- 236
+chr.to.int$ -- 22
+cite$ -- 22
+duplicate$ -- 410
+empty$ -- 616
+format.name$ -- 512
+if$ -- 2793
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 22
+newline$ -- 70
+num.names$ -- 88
+pop$ -- 245
+preamble$ -- 1
+purify$ -- 236
+quote$ -- 0
+skip$ -- 394
+stack$ -- 0
+substring$ -- 591
+swap$ -- 0
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 198
+warning$ -- 0
+while$ -- 88
+width$ -- 0
+write$ -- 220
+(There were 6 error messages)
