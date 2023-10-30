@@ -1,6 +1,6 @@
 all:
 		./compile.sh
 clean:
-		rm *.aux *.blg *.log *.bbl *.out *~
+		rm *.aux *.blg *.log *.out *~
 
 

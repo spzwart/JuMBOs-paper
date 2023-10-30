@@ -6,7 +6,7 @@ README.md
 # directory structure:
 tex            # latex files
  -figures      # figure files for the latex paper
- -style
+ -lib	       # Latex helper libraries
 src	       # python files
 data
  -observations # observed data
