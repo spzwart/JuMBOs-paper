@@ -291,23 +291,27 @@ encounter between the planetary systems and a passing star.  In
 table\,\ref{Tab:model_PP} we summarize the results of model ${\cal
   PP}$.
 
-\begin{table}
+\begin{table*}
  \caption{...}
  \label{Tab:model_PP}
  \centering 
- \begin{tabular}{lrrrrrrr}
+ \begin{tabular}{lrrrrrrrrrrrr}
  \hline\hline
-model & $n_{(s,j)}$ & $n_{(j,j)}$ & $n_{j}$ & $\langle M \rangle$ & $\langle m \rangle$ & $\langle a \rangle$ & $\langle e \rangle$ \\
+model & $n_{(b,s)}$&$n_{(b,p)}$ & $n_{(s,s)}$ & $n_{(s,p)}$ & $n_{(p,p)}$ & $n_{p}$ & $\langle M \rangle$ & $\langle m \rangle$ & $\langle a \rangle$ & $\langle e \rangle$ \\
         \hline \vspace{-0.75em}\\
-${\cal SPP}$\_Pl\_R025 && 0.4 &0& 7.35    & 2.3  & 2388 & 0.70 \\
-${\cal SPP}$\_Pl\_R050 && 0.7 &0& 6.76    & 2.44 & 2196 & 0.86 \\
-${\cal SPP}$\_Pl\_R100 && 0.4 &0& 3.77    & 1.67 & 1507 & 0.28 \\
-${\cal SPP}$\_Fr\_R025 && 0.0 &0&  ---    & ---  &  --- & ---  \\			
-${\cal SPP}$\_Fr\_R050 && 0.1 &0& 3.8     & 1.9  & 118  & 0.99 \\
-${\cal SPP}$\_Fr\_R100 && 0.2 &0& 8.3     & 5.8  & 147  & 0.94 \\ 
+${\cal SPP}$\_Pl\_R025 &87.9& 0.15 &0.0& 197.6 & 0.75 &1001 & 4.21 & 1.5  & 497 & 0.87 \\
+${\cal SPP}$\_Pl\_R050 &88.9& 0.30 &0.0& 201.3 & 1.0  & 997 \\
+${\cal SPP}$\_Pl\_R100 &85.9& 0.10 &0.0& 195.2 & 0.8  & 1003 & 3.27 & 1.31 & 673 & 0.84 \\
+${\cal SPP}$\_Fr\_R025 & 13.4 & 0.0 & 71.3 & 43.6 & 0.1 & 1160 \\
+${\cal SPP}$\_Fr\_R050 & 11.0 & 0.0 & 75.2 & 40.0 & 0.2 & 1160 \\
+${\cal SPP}$\_Fr\_R100 & 16.0 & 0.0 & 71.9 & 42.1 & 0.1 & 1158 \\
  \hline
+  \hline \vspace{-0.75em}\\
+  ${\cal SPM}$\_Pl\_R05 &51.2 & 50.7 & 0.0 & 61.3 & 567.1 & 4.5 & 3.24 & 4.20 & 225 & 0.21 \\
+  ${\cal SPM}$\_Fr\_R05 &6.0 & 1.9 & 68.6 & 15.8 & 103.1 & 978 & 3.55 & 4.91 & 176 & 0.47 \\
+  \hline
  \end{tabular}
-\end{table}
+\end{table*}
 
 The ${\cal SPP}$ model calculations fail to reproduce the observed
 population of \jumbos. With a total of 600 planetary systems with two
@@ -363,20 +367,6 @@ leads to \jumbos\, with a similar orbital distance seems reasonable.
 
 \subsection{Model ${\cal SPM}$}
 
-
-\begin{table}
- \caption{...}
- \label{Tab:model_SPM}
- \centering 
- \begin{tabular}{lrrrrrrr}
-   \hline\hline
-model & $n_{(s,j)}$ & $n_{(j,j)}$ & $n_{j}$ & $\langle M \rangle$ & $\langle m \rangle$ & $\langle a \rangle$ & $\langle e \rangle$ \\
-        \hline \vspace{-0.75em}\\
-${\cal SPM}$\_Pl\_R05 && 286.5 &  82.3& 4.19  & 3.24 & 224.9 & 0.21 \\
-${\cal SPM}$\_Fr\_R05 &&  61.7 & 113.6& 4.90  & 3.55 & 175.8 & 0.47 \\ 
- \hline
- \end{tabular}
-\end{table}
 
 \subsection{Model ${\cal FFC}$}
 
@@ -539,8 +529,25 @@ Pl with Rvir= 0.25pc rH=5, q=sqrt()
 t   N/run  <M>	<m>	<a>	<e>	Nruns
 1.0 0.8	   2.50 1.36   2716.31   0.777  10
 
+SPP models:
+F,amin,amax,Nbs,Nbp,Nss,Nsp,Npp,    M,dM,m,dm,q,dq,a,da,e,de
+PlN2500n600cs_R0.25pcQ05_R.0010.csv,0,1,87.9,0.15,0.0,197.575,0.75,   1.5182175287307713,0.560698545375267,4.214078182297578,4.095751989095275,2.3313106716943386,1.6790659126026926,496.95907830935147,281.2222075471759,0.8733079229200573,0.09833531990765235
+PlN2500n600cs_R0.5pcQ05_R.0010.csv,0,1,88.9,0.3,0.0,201.3,1.0    ,nan,nan,nan,nan,nan,nan,nan,nan,nan,nan
+PlN2500n600cs_R1.0pcQ05_R.0010.csv,0,1,85.8,0.1,0.0,195.2,0.8,3.270505088406785,    0.0,1.316197735754376,0.0,0.4024447906899778,0.0,673.1443537047858,0.0,0.08404250840976944,0.0
+
+FrN2500n600cs_R0.25pcQ05_R.0011.csv,0,1,13.399999999999999,0.0,71.3,43.6,0.1,nan,nan,nan,nan,nan,nan,nan,nan,nan,nan
+
+
+
 SPM models:
-   F,amin,amax,Nss,Nsp,Nj,M,dM,m,dm,q,dq,a,da,e,de
-PlN2500n600pm_R0.5pcQ05_R.0010.csv,0,1,-7653,823,2865,3.241863236847126,3.146419649374478,4.1994324138885455,3.6477551651523243,2.292947966246368,2.9219855055516857,224.8664798090486,107.62369768018677,0.21362638856650273,0.24988436693392485
-FrN2500n600pm_R0.5pcQ05_R.0011.csv,0,1,-1028,1136,617,3.5484148732876206,3.317421904592993,4.905084847828215,4.019173763984519,2.5668243481935926,3.2345942681146256,175.82553098470015,150.19026253990216,0.4658461018866108,0.2849317239089184
+
+F,amin,amax,Nbs,Nbp,Nss,Nsp,Npp,M,dM,m,dm,q,dq,a,da,e,de
+PlN2500n600pm_R0.5pcQ05_R.0010.csv,0,1,51.2,50.7,0.0,61.3,567.1,3.241863236847126,3.146419649374478,4.1994324138885455,3.6477551651523243,2.292947966246368,2.9219855055516857,224.8664798090486,107.62369768018677,0.21362638856650273,0.24988436693392485
+
+F,amin,amax,Nbs,Nbp,Nss,Nsp,Npp,M,dM,m,dm,q,dq,a,da,e,de
+FrN2500n600pm_R0.5pcQ05_R.0011.csv,0,1,6.0,1.9,68.6,15.8,103.1,3.5484148732876206,3.317421904592993,4.905084847828215,4.019173763984519,2.5668243481935926,3.2345942681146256,175.82553098470015,150.19026253990216,0.4658461018866108,0.2849317239089184
+F,amin,amax,Nbs,Nbp,Nss,Nsp,Npp,    M,dM,m,dm,q,dq,a,da,e,de
+PlN2500n600cs_R0.25pcQ05_R.0010.csv,0,1,87.9,0.15,0.0,197.575,0.75,   1.5182175287307713,0.560698545375267,4.214078182297578,4.095751989095275,2.3313106716943386,1.6790659126026926,496.95907830935147,281.2222075471759,0.8733079229200573,0.09833531990765235
+PlN2500n600cs_R0.5pcQ05_R.0010.csv,0,1,88.9,0.3,0.0,201.3,1.0    ,nan,nan,nan,nan,nan,nan,nan,nan,nan,nan
+PlN2500n600cs_R1.0pcQ05_R.0010.csv,0,1,85.8,0.1,0.0,195.2,0.8,3.270505088406785,    0.0,1.316197735754376,0.0,0.4024447906899778,0.0,673.1443537047858,0.0,0.08404250840976944,0.0
 
