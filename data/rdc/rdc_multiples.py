@@ -1,15 +1,86 @@
 import numpy as np
+from scipy.stats import iqr
 from amuse.units import units
 from amuse.plot import plot
 from matplotlib import pyplot as plt
 
 import pandas as pd
 
+# find binaries with at least one planet
+def split_binaries(binaries, mplanet=50):
+    sx = binaries[binaries.M>=mplanet]
+    ss = sx[sx.m>=mplanet]
+    px = binaries[binaries.M<mplanet]
+    pp = px[px.m<mplanet]
+    sp = sx[sx.m<mplanet]
+    ps = px[px.m>=mplanet]
+    n = len(binaries)
+    nb = len(ss) + len(sp) + len(ps) + len(pp)
+    print("split:", len(ss), len(sp), len(ps), len(pp), "::", n, nb)
+    return ss, sp, ps, pp
+
+def find_planet_pairs_in_quadruple_systems(binaries, binbin):
+    print("find quadruples.")
+    ss,sp,ps,pp = split_binaries(binaries)
+    print(len(pp))
+
+    #find pp in quadruples
+    ppxx = binbin[binbin.k1.isin(pp.key)]
+    xxpp = binbin[binbin.k2.isin(pp.key)]
+    
+    #find the planet pairs which are member of a quadruple
+    ppiqk1 = binaries[binaries.key.isin(ppxx.k1)]
+    ppiqk2 = binaries[binaries.key.isin(xxpp.k2)]
+    biq = ppiqk1.append(ppiqk2)
+    
+    pppp = ppxx[ppxx.k2.isin(pp.key)]
+    binaries = binaries.drop(ppiqk1.index)
+    binaries = binaries.drop(ppiqk2.index)
+    print("Nbin=", len(binaries)+len(pppp)+len(ppiqk1)+len(ppiqk2))
+
+    return binaries, biq, xxpp, ppxx, pppp
+
+def find_planet_pairs_in_triple_systems(binaries, triples):
+    print("find triples.")
+
+    ss,sp,ps,pp = split_binaries(binaries)
+    print("pp=",len(pp))
+    
+    #find pp in quadruples
+    ppx = triples[triples.k1.isin(pp.key)]
+    xpp = triples[triples.k2.isin(pp.key)]
+
+    #find the planet pairs which are member of a triple
+    ppitk1 = binaries[binaries.key.isin(ppx.k1)]
+    ppitk2 = binaries[binaries.key.isin(xpp.k2)]
+    bit = ppitk1.append(ppitk2)
+    #print(bit)
+    
+    ppp = ppx[ppx.k2.isin(pp.key)]
+    binaries = binaries.drop(ppp.index)
+    binaries = binaries.drop(ppitk1.index)
+    binaries = binaries.drop(ppitk2.index)
+    print("Nbin=", len(binaries)+len(ppp)+len(ppitk1)+len(ppitk2))
+    #print(binaries)
+
+    return binaries, bit, xpp, ppx, ppp
+
+def rounded_means_quartiles(data):
+    M25 =iqr(data, rng=(25, 50))
+    M75 =iqr(data, rng=(50, 75))
+    Mm  = np.median(data)
+    M25 = round(M25,2)
+    M75 = round(M75,2)
+    Mm = round(Mm,2)
+    return Mm, M25, M75
+
 def new_option_parser():
     from amuse.units.optparse import OptionParser
     result = OptionParser()
     result.add_option("-f", dest="filename", default = "PlN2500n600cs_R0.25pcQ05_JuMBOs.csv",
                       help="input filename[%default]")
+    result.add_option("-n", dest="nrun", type="int", default = "4",
+                      help="number of runs [%default]")
     return result
 
 if __name__ in ('__main__', '__plot__'):
@@ -23,141 +94,57 @@ if __name__ in ('__main__', '__plot__'):
         amin = 0
         amax = 1
 
-    """
-    for idx, *row in data.itertuples():
-        print(idx)
-        print(row)
-        print(row[6])
-        if row[6]<row[8]:
-            m = row[6]
-            row[6] = row[8]
-            row[8] = m   
-    """
-    """
-    M1 = d["M"] 
-    M2 = d["m"]
-    for i in range(len(M1)):
-        if M1[i]<M2[i]:
-            m = M1[i]
-            M1[i] = M2[i]
-            M2[i] = m
-    """
-
-    #data = d
-
-    binaries = data[data['type'] == 'binary']
+    all_binaries = data[data['type'] == 'binary']
     triples = data[data['type'] == 'triple']
     tripsing = data[data['type'] == 'tripsing']
     binbin = data[data['type'] == 'binbin']
 
-    binkk = binaries['key']
-    bink1 = binaries['k1']
-    bink2 = binaries['k2']
-    tripk1 = triples['k1']
-    tripk2 = triples['k2']
-    bbk1 = binbin['k1']
-    bbk2 = binbin['k2']
-    tsk1 = tripsing['k1']
-    tsk2 = tripsing['k2']
+    mplanet = 50 # objects less massive than 50 jupiters is considered a planet
 
-    #mplanet = 0.08
-    mplanet = 50
+    binaries, biq, xxpp, ppxx, pppp = find_planet_pairs_in_quadruple_systems(all_binaries, binbin)
+    print(len(binaries), len(xxpp), len(ppxx), len(pppp))
     
-    sx = binaries[binaries.M>=mplanet]
-    xs = binaries[binaries.m>=mplanet]
-    ss = sx[sx.m>=mplanet]
-    sp = sx[sx.m<mplanet]
-    px = binaries[binaries.M<mplanet]
-    xp = binaries[binaries.m<mplanet]
-    pp = px[px.m<mplanet]
-    ps = px[px.m>mplanet]
+    binaries, bit, xpp, ppx, ppp = find_planet_pairs_in_triple_systems(binaries, triples)
+    print(len(binaries), len(xpp), len(ppx), len(ppp))
 
-    print(f"stars: {len(sx)}, {len(xs)}, ss={len(ss)}, sp={len(sp)}")
-    print(f"planets: {len(px)}, {len(xp)},pp= {len(pp)}, ps={len(ps)}")
-    n_s = len(sp) + len(ps) + 2*len(ss)
-    n_p = len(sp) + len(ps) + 2*len(pp)
-    print(f"N(sp + ps)= {len(ps)}+{len(sp)}={len(ps)+len(sp)}, N(s)={n_s}, N(p)={n_p}")
-    n_sp = len(ps)+len(sp)
+    #now analyze the left-over binaries
+    ss,sp,ps,pp = split_binaries(binaries)
+    print(len(ss), len(sp), len(ps), len(pp))
 
-    nstars = 2500
-    nplanets = 1200
-    nrun = 10
+    nspp = 0
+    if len(xpp)>0:
+        spp = xpp[xpp.M>=mplanet]
+        nspp = len(spp)
+        print(spp)
+    if len(ppx)>0:
+        pps = ppx[ppx.m>=mplanet]
+        nspp += len(pps)
+        print(pps)
+    npppp = len(ppp)
+    nppp = len(ppp)
+    nss = len(ss)/o.nrun
+    nsp = (len(sp) + len(ps))/o.nrun
+    npp = len(pp)/o.nrun
+    n_p = 1200 - (3*nppp +2*npp +nsp)
 
-    print("Numbers per cluster")
-    print(f"number of single stars: {nstars-n_s/nrun}")
-    print(f"number of single planets: {nplanets-n_p/nrun}")
-    print(f"number of (s,s): {len(ss)/nrun}")
-    print(f"number of (s,p): {n_sp/nrun}")
-    print(f"number of (p,p): {len(pp)/nrun}")
-    print(f"checksum stars: {nstars-n_s/nrun + 2*len(ss)/nrun + n_sp/nrun}")
-    print(f"checksum planets: {nplanets-n_p/nrun + 2*len(pp)/nrun + n_sp/nrun}")
-
-    nss = len(ss)/nrun
-    nsp = n_sp/nrun
-    npp = len(pp)/nrun
-
-    tbap = triples[triples.k1.isin(binaries.key)]
-    n_bs = len(tbap[tbap.m>=mplanet])/nrun
-    n_jjs = len(tbap[tbap.M<mplanet])/nrun
-    n_bp = len(tbap[tbap.m<mplanet])/nrun
- 
-    tbas = triples[triples.k2.isin(binaries.key)]
-    try:
-        n_sb = len(tbas[tbap.M>=mplanet])/nrun
-        n_pb = len(tbas[tbap.M<mplanet])/nrun
-    except:
-        n_sb = len(tbas)/nrun
-        n_pb = 0.0
-
-    nbs = n_bs+n_sb
-    nbp = n_bp+n_pb
-    print(f"stars in triples n(bs)= {nbs}")
-    print(f"planets in triples n(bp)= {nbp}")
-        
-    #jumbos should not be member of a triple
-    non_jumbos = binaries[binaries.key.isin(triples.k1) | binaries.key.isin(triples.k2)]
-    jumbos = binaries.drop(non_jumbos.index)
-    print(jumbos)
-
+    M1 = pp["M"]
+    M2 = pp["m"]
+    m1 = []
+    m2 = []
+    for i in pp.index:
+        if M1[i]<M2[i]:
+            m1.append(M2[i])
+            m2.append(M1[i])
+        else:
+            m1.append(M1[i])
+            m2.append(M2[i])
     
-    #jumbos should not be member of a quadruple
-    non_jumbos = jumbos[jumbos.key.isin(tripsing.k1) |jumbos.key.isin(tripsing.k2)]
-    jumbos = jumbos.drop(non_jumbos.index)
-
-    #jumbos should not be member of a quadruple
-    non_jumbos = jumbos[jumbos.key.isin(binbin.k1) |jumbos.key.isin(binbin.k2)]
-    jumbos = jumbos.drop(non_jumbos.index)
-    print(jumbos)
+    Mm, M25, M75 = rounded_means_quartiles(m1)
+    mm, m25, m75 = rounded_means_quartiles(m2)
+    am, a25, a75 = rounded_means_quartiles(pp["a"])
+    em, e25, e75 = rounded_means_quartiles(pp["e"])
     
-    print(f"Njumbos (before mass and semimajor axis selection) ={len(jumbos)}")
-    #jumbos = binbin
-    #print(jumbos)
+    print("Table 1")
+    print(f"{o.filename} & {nss} & {nsp} & {n_p} & {npp} & {nspp} & {nppp} & {npppp} \\\\")
+    print(f"${Mm}^{{+{M75}}}_{{-{M25}}}$ & ${mm}^{{+{m75}}}_{{-{m25}}}$ & ${am}^{{+{a75}}}_{{-{a25}}}$ & ${em}^{{+{e75}}}_{{-{e25}}}$ \\\\")
 
-    jumbos = jumbos[jumbos['M'] > 0.6]
-    jumbos = jumbos[jumbos['M'] < 20]
-    jumbos = jumbos[jumbos['m'] > 0.6]
-    jumbos = jumbos[jumbos['m'] < 20]
-    jumbos = jumbos[jumbos['a'] < 10000]
-
-    print(f"Njumbos ={len(jumbos)}")
-    #jumbos = binbin
-    
-    type = jumbos["type"] 
-    key = jumbos["key"] 
-    k1 = jumbos["k1"] 
-    k2 = jumbos["k2"] 
-    M1 = jumbos["M"] 
-    M2 = jumbos["m"] 
-    a = jumbos["a"] 
-    e = jumbos["e"] 
-    i = jumbos["i"] 
-    x = jumbos["x"] 
-    y = jumbos["y"] 
-    z = jumbos["z"] 
-    vx = jumbos["vx"] 
-    vy = jumbos["vy"] 
-    vz = jumbos["vz"]
-    q = M2/M1
-
-    print("F,amin,amax,Nbs,Nbp,Nss,Nsp,Npp,M,dM,m,dm,q,dq,a,da,e,de")
-    print(f"{o.filename},{amin},{amax},{nbs},{nbp},{nss},{nsp},{npp},{np.mean(M1)},{np.std(M1)},{np.mean(M2)},{np.std(M2)},{np.mean(q)},{np.std(q)},{np.mean(a)},{np.std(a)},{np.mean(e)},{np.std(e)}")

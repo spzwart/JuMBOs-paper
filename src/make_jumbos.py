@@ -112,8 +112,8 @@ def make_arXiv2310_06016(bodies, a1=800|units.au, a2=1000|units.au, jumbo_mass_f
         rH = Hill_radius(mprim[0], a1, msec[0])
         #print("Hill radius=", a1.in_(units.au), rH.in_(units.au))
         #a2 = sma_from_Hill_radius(mprim[1], msec[1], rH)
-        #a2 = a1 + 10*rH
-        a2 = a1 + 5*rH
+        a2 = a1 + 10*rH
+        #a2 = a1 + 5*rH
         #a2 = a1 + 2*rH
         sma = [a1.value_in(units.au), a2.value_in(units.au)] | units.au
         #print("initial semimajor_axis=", sma.in_(units.au))
@@ -223,12 +223,11 @@ def make_isolated_jumbos(bodies):
     JuMBOs = bodies[bodies.name=="jumbos"]
     njumbos = len(JuMBOs)
     print(f"N= {njumbos}")
-    q = numpy.sqrt(numpy.random.uniform(0.5**2, 1, njumbos))
-    mprim = JuMBOs.mass*q
-    msec = JuMBOs.mass*(1-q)
+    #q = numpy.sqrt(numpy.random.uniform(0.5**2, 1, njumbos))
+    mprim = JuMBOs.mass
+    msec = JuMBOs.m2
+    #sma = numpy.random.uniform(10, 100, njumbos) | units.au
     sma = numpy.random.uniform(10, 1000, njumbos) | units.au
-    #sma = 10**numpy.random.uniform(1, 4, njumbos) | units.au
-    #print(sorted(sma.in_(units.au)))
 
     ecc = numpy.sqrt(numpy.random.uniform(0, 0.9**2, njumbos))
     inc = numpy.arccos(1-2*numpy.random.uniform(0,1, njumbos))| units.rad

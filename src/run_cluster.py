@@ -47,7 +47,8 @@ def resolve_collision(collision_detection, gravity, bodies):
         print("At time=", gravity.model_time.in_(units.Myr), \
               "number of encounters=", len(collision_detection.particles(0)))
         Nenc = 0
-        for ci in range(len(collision_detection.particles(0))): 
+        for ci in range(len(collision_detection.particles(0))):
+            print("Collision between: ", collision_detection.particles(0)[ci].key, "and", collision_detection.particles(1)[ci].key)
             particles_in_encounter \
                 = Particles(particles=[collision_detection.particles(0)[ci],
                                        collision_detection.particles(1)[ci]])
@@ -98,7 +99,7 @@ def make_initial_cluster(Nstars, Njumbos, Rvir, Fd, jumbo_model,
     masses = new_kroupa_mass_distribution(N, mass_min=Mmin, mass_max=Mmax)
     
     Mtot_init = masses.sum()
-    converter=nbody_system.nbody_to_si(Mtot_init, 1|units.Myr)
+    converter=nbody_system.nbody_to_si(Mtot_init, Rvir)#1|units.Myr)
     if Fd>0:
         bodies = new_fractal_cluster_model(N, fractal_dimension=1.6, convert_nbody=converter)
     else:
@@ -107,12 +108,26 @@ def make_initial_cluster(Nstars, Njumbos, Rvir, Fd, jumbo_model,
     bodies.name = "star"
     bodies.type = "star"
     bodies.radius = ZAMS_radius(bodies.mass)
-    if jumbo_model=="freefloaters":
+    if jumbo_model=="singletons":
         JuMBOs = bodies.random_sample(Njumbos)
-        JuMBOs.mass = 20 | units.MJupiter
+        JuMBOs.mass = new_salpeter_mass_distribution(Njumbos,
+                                                     0.8|units.MJupiter,
+                                                     14|units.MJupiter, alpha=-1.2)
         JuMBOs.name = "jumbos"
         JuMBOs.type = "planet"
         JuMBOs.radius = 1 | units.RJupiter
+        bodies.scale_to_standard(convert_nbody=converter)
+        bodies.move_to_center()
+    elif jumbo_model=="freefloaters":
+        JuMBOs = bodies.random_sample(Njumbos)
+        JuMBOs.mass = new_salpeter_mass_distribution(Njumbos,
+                                                     0.8|units.MJupiter,
+                                                     14|units.MJupiter, alpha=-1.2)
+        q = numpy.sqrt(numpy.random.uniform(0.2**2, 1, Njumbos))
+        JuMBOs.name = "jumbos"
+        JuMBOs.type = "planet"
+        JuMBOs.radius = 1 | units.RJupiter
+        JuMBOs.m2 = JuMBOs.mass * (1-q)
         bodies.scale_to_standard(convert_nbody=converter)
         bodies.move_to_center()
         jumbos = make_isolated_jumbos(bodies)
@@ -147,7 +162,7 @@ def make_initial_cluster(Nstars, Njumbos, Rvir, Fd, jumbo_model,
     
     return bodies
         
-def  run_cluster(bodies, t_end, dt):
+def  run_cluster(bodies, Rvir, t_end, dt):
 
     stars = bodies[bodies.name=="star"]
     hosts = bodies[bodies.name=="host"]
@@ -162,11 +177,13 @@ def  run_cluster(bodies, t_end, dt):
     plt.show()
     """
 
-    converter=nbody_system.nbody_to_si(1|units.Myr, bodies.mass.sum())
+    converter=nbody_system.nbody_to_si(bodies.mass.sum(), Rvir)
     gravity = ph4(converter, number_of_workers=2)
+    #gravity = Petar(converter)#, mode="gpu")#, number_of_workers=6)
     #gravity = Petar(converter, mode="gpu")#, number_of_workers=6)
-    #gravity = Petar(converter, mode="gpu")#, number_of_workers=6)
-    #gravity.parameters.timestep_parameter = 0.01
+    #print(gravity.parameters)
+    #gravity.parameters.epsilon_squared = (1|units.au)**2
+    #gravity.parameters.timestep_parameter = 0.05
     gravity.particles.add_particles(bodies)
     collision_detection = gravity.stopping_conditions.collision_detection
     collision_detection.enable()
@@ -257,7 +274,7 @@ def new_option_parser():
                       dest="t_end", type="float", default = 1.0 | units.Myr,
                       help="end time of the simulation [%default.value_in(units.Myr]")
     result.add_option("--model", dest="jumbo_model", default = "classic",
-                      help="select jumbo model (freefloaters, circum_stellar, planetmoon, oligarchic) [%default]")
+                      help="select jumbo model (freefloaters, circum_stellar, planetmoon, oligarchic, singletons) [%default]")
     result.add_option("-q", action='store_true',
                       dest="jumbo_mass_function", default="False",
                       help="jumbo mass function [%default]")
@@ -268,5 +285,5 @@ if __name__ in ('__main__', '__plot__'):
 
     bodies = make_initial_cluster(o.Nstars, o.Njumbos, o.Rvir, o.Fd, o.jumbo_model,
                                   o.a1, o.a2, o.jumbo_mass_function)
-    run_cluster(bodies, o.t_end, o.dt)
+    run_cluster(bodies, o.Rvir, o.t_end, o.dt)
 

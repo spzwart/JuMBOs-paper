@@ -4,6 +4,8 @@
 \usepackage{comment}
 \usepackage{txfonts}
 \usepackage{stfloats}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \newcommand{\spz}[1] {{\texttt{\textbf{SPZ: #1}}} }
 \newcommand{\eh}[1] {{\texttt{\textbf{ EH: #1}}} }
 \newcommand{\LSun}{\mbox{${L}_\odot$}}
@@ -19,6 +21,7 @@
 \newcommand{\jumbo}{\mbox{JuMBO}}
 \newcommand{\jumbos}{\mbox{JuMBOs}}
 
+\algnewcommand{\LineComment}[1]{\State \(\triangleright\) #1}
 \def\ind#1#2{\hbox{\hskip 0.0truein\hbox to 0.2truein{#1\hfil}
 	        \hbox{\hsize 6.0truein\vtop{\ni#2}\hfil}}\vskip 1pt}
 
@@ -41,18 +44,41 @@
 
 %--------------------------------------------------------------------
   \abstract
-  % context heading (optional)
-   {}
+  %% context heading (optional)
+      {The revenly observed population of 540
+  free-floating jupiter-mass objects, and 42 dynamicall soft pairs of
+  jupiter-mass planets, among which 2 with a tertiary companion, in the Trapezium cluster has
+  raised interesting questions on their formation and further
+  evolution. }
   % aims heading
-   {}
-  % methods heading
-   {}
-  % results heading
-   {}
-  % conclusions heading (optional)
-   {}
-   \keywords{gravitational waves -- stars: black holes -- galaxies: nuclei -- stars: kinematics and dynamics -- black hole physics
-            }
+   {We test various scenarios for the origin and survivability of
+  these free floating jupiter-mass planets and Jupiter-mass Binary Objects
+  (JuMBOs) in the Trapezium cluster.  }
+   % methods heading
+   {The numerical calculations are performed by direct N-body
+     integration of the stars and planets in the Trapezium cluster
+     starting with a wide variety of planets in various
+     configurations. We discuss four main models: $\mathcal{SPP}$ in
+     which selected stars have two outer orbiting jupiter-mass
+     planets; $\mathcal{SPM}$ where selected stars are orbited by have
+     jupiter-mass planet-moon pairs; $\mathcal{ISF}$ in which
+     \jumbos\, are formed in situ together with the stars. and
+     $\mathcal{FFC}$ wherewe introduce a large population of free
+     floating single jupiter-mass objects, but no binaries.  }
+   % results heading
+   {Models $\mathcal{SPP}$ and $\mathcal{FFC}$ spectacularly fail to
+     produce enough \jumbos. Models $\mathcal{SPM}$ can produce
+     sufficient free floaters and \jumbos\, but require to start with
+     unrealistically wide orbits for the planet-moon system around the
+     star.  The observations are best explained with in situ formation
+     (model $\mathcal{ISF}$) of \jumbos.  }
+   % conclusions heading (optional)
+   {The observed populations of \jumbos\, and free floating planets in
+     the Trapezium cluster are best reproduced all planets formed in
+     pairs together with the other stars in a fractal distribution
+     with a virial radius of $\sim 0.5$\,pc.  }
+   
+   \keywords{...}
 
    \maketitle
    
@@ -60,22 +86,51 @@
 \section{Introduction}
 
 Recently \cite{2023arXiv231001231P} reported on the discovery of 42
-jupiter-mass binaries in the direction of the Trapezium cluster.
-Their component masses are between 0.6\,\MJup\, and 14\,\MJup\, with
-projected separations between 25\,au and 380\,au.  Two of these
-objects have a nearby tertiary jupiter-mass companion, and they found
-an additional population of 540 single objects in the same mass
-range. This discovery initiates the discussions on their origin and
-surviveability in a clustered environment.  Single free floating
-planetary objects were discovered in abundance (between 70 and 170
-candidates) before in the 10\,Myr old association Upper Scorpius
-\cite{2022NatAs...6...89M}, but these were considered to be single.
+Jupiter-Mass Binary Objects (\jumbos) in the direction of the
+Trapezium cluster.  Their component masses are between 0.6\,\MJup\,
+and 14\,\MJup\, with projected separations between 25\,au and 380\,au.
+Two of these objects have a nearby tertiary jupiter-mass companion,
+and they found an additional population of 540 single objects in the
+same mass range. This discovery initiates the discussions on their
+origin and surviveability in a clustered environment.
 
-Jupiter-mass free floaters have been found before, but they are
-generally isolated or with small (few au) separations
-\citep{2021ApJS..253....7K}.  Known interstellar jupiter-mass binary
-objects include\\
-%%%
+The first single free-floating jupiter-mass objects have been found in
+the direction of the Trapzium cluster more than 20 years ago
+\cite{2000Sci...290..103Z,2000MNRAS.314..858L,2000AGM....17..A11M}.  Many more have been
+found since then, for example in the young clustered environment of
+Upper Scorpio \cite{2022NatAs...6...89M}, and through gravitational
+microlensing surveys in the direction of the Galactic bulge
+\cite{2011Natur.473..349S}.  Their abundance may be as high as
+$1.9^{+1.3}_{-0.8}$ per star \cite{2011Natur.473..349S}, although a
+considerable fraction of these could be in wide orbits.
+
+The origin of free floating planets has been actively debated. Star
+formation, from the collapse of a molecular cloud through
+gravitational instability, generally is expected to lead to objects
+considerably more massive than Jupiter
+\citep{1976MNRAS.176..367L,2005A&A...430.1059B}.  As a consequence,
+the large population of jupiter-mass free-floaters is considered to
+result from fully packed planetary systems, or kicked out of their
+orbit by encounters with other stars in the young cluster. Single
+jupiter-mass free floating objects then originally formed in a disk
+around a star but became single later in life
+\cite{1996Sci...274..954R,2015MNRAS.453.2759Z,2002ApJ...565.1251H,2017MNRAS.470.4337C,
+  2019MNRAS.489.2280F, 2019A&A...624A.120V}.  The number of
+super-jupiter mass free floating planets formed in this way is
+expected to be on the order of one ($\sim 0.71$) per star
+\citep{2019A&A...624A.120V}, but lower-mass free floaters orphaned
+this way may be much more abundant \cite{2002ApJ...565.1251H}.  The
+origin of relatively massive free-floaters through dynamical phenomena
+is further complicated by the tendency for lower mass planets to be
+more prone to ejections
+\citep{2001Icar..150..303F,2013MNRAS.433..867H,2019MNRAS.489.2280F,2020MNRAS.497.1807S}.
+
+Explaining the observed abundance and mass-function of single
+free-floating jupiter-mass objects appears to be difficult, but
+recently a new population of paired free floaters have been
+discovered.  So far, binary object have been discovered in tight (few
+au) orbits \citep{2021ApJS..253....7K}.  Known interstellar
+jupiter-mass binary objects include only four objects:
 \begin{itemize}
 \item[$\bullet$]2MASS J11193254-1137466 AB: a $5$ to 10\,\MJup\,
   primary in a $a=3.6\pm0.9$\,au orbit \citep{2017ApJ...843L...4B}.
@@ -89,51 +144,45 @@ objects include\\
   suspected to be a binary by \cite{2019A&A...629A.145E}.
 \end{itemize}
 
-Star formation, from the collapse of a molecular cloud through
-gravitational instability, generally is expected to lead to objects
-considerably more massive than Jupiter
-\citep{1976MNRAS.176..367L,2005A&A...430.1059B}.  As a consequence,
-the large population of jupiter-mass free-floaters is considered to
-result from the ejected planets from dynamically unstable planetary
-systems. Single jupiter-mass free floating objects can be explained
-perfectly well from planetary system ejections, but paired planets
-pose a different challenge, in particular if they have wide orbits.
+Such tight pairs could have formed as planet-moon pairs which are
+dislodged from their parent star to become \jumbos\,
+\cite{2016ApJ...819..125C}.  However, since only a few were discovered
+such an exotic scenario seems to pose a reasonable explanation for
+their existence.  The new discovery of a rich population of $42$ wide
+(25\,au to 380\,au) \jumbos\, \cite{2023arXiv231001231P} requires a
+more thorough study on their origin.
 
-Several studies considered the possibility of planetary systems losing
-outer-planets in dynamical interactions in dense stellar systems (see
-i.e., \cite{1996Sci...274..954R,2015MNRAS.453.2759Z,
-  2017MNRAS.470.4337C, 2019MNRAS.489.2280F, 2019A&A...624A.120V}), but
-they focus on the ejection of single planets, not binaries.  Their
-origin through dynamical phenomena is further complicated by the
-tendency for lower mass planets to be more prone to ejections
-\citep{2001Icar..150..303F,2013MNRAS.433..867H,2019MNRAS.489.2280F,2020MNRAS.497.1807S}.
-
-We naively recognize four main scenarios for producing \jumbos.
-Alternative to forming in situ (which we call scenario ${\cal ISF}$),
-one can naively imagine three mechanisms to form jupiter mass binary
-objects. \cite{2023arXiv231006016W} argued that these binaries could
-be explained from planetary systems of which the outer two planets are
-stripped by a passing star in a close encounter. The two ejected
-planets would lead to a population of free floating planets, but could
-also explain the observed population of \jumbos.  We call this
-scenario ${\cal SPP}$.
+Adopting a dynamical origin, or at least a dynamical history, we
+perform direct N-body simulations of a Trapezium-like cluster with
+primordial planets and \jumbos. With the simulations, we focus on four
+models that could explain the abundance and orbital characteristics of
+the observed jupiter-mass objects in the cluster.  We naively
+recognize four main scenarios for producing \jumbos.  Alternative to
+forming in situ (which we call scenario ${\cal ISF}$, from in-situ
+formation), one can naively imagine three mechanisms to form jupiter
+mass binary objects. \cite{2023arXiv231006016W} argued that these
+binaries could be explained from planetary systems of which the outer
+two planets are stripped by a passing star in a close encounter. The
+two ejected planets would lead to a population of free floating
+planets, but could also explain the observed population of \jumbos.
+We call this scenario ${\cal SPP}$ (for star planet-planet).
 
 Alternatively one could imagine \jumbos\, to result from planet-moon
-pairs orbiting some star that is ejected to become a jumbo.  We call
-this scenario ${\cal SPM}$).
+pairs orbiting some star that is ejected to become a \jumbo.  We call
+this scenario ${\cal SPM}$, for star planet-moon.
 
-Finally, one could imagine that a sufficiently large population
-of free-floating jupiter-mass objects could lead to a population of
-jumbos by dynamical capture of one jupiter by another.  We call this
-scenario ${\cal FFC}$. A similar scenario was proposed by
-\cite{2010MNRAS.404.1835K} for explaining very wide stellar pairs, but
-the model was also adopted to account for wide planetary orbits
-\citep{2012ApJ...750...83P}.
+Finally, one could imagine that a sufficiently large population of
+free-floating jupiter-mass objects could lead to a population of
+\jumbos by dynamical capture of one jupiter by another.  We call this
+scenario ${\cal FFC}$ (free floating capture). A similar scenario was
+proposed by \cite{2010MNRAS.404.1835K} for explaining very wide
+stellar pairs, but the model was also adopted to account for wide
+planetary orbits \citep{2012ApJ...750...83P,2018MNRAS.473.1589G}
 
 We start by discussing some fundamental properties of the
 environmental dynamics, followed by a description of numerical
-simulations to characterize the parameters of the acquired jumbos and
-the resulting occurrence rates.
+simulations to characterize the parameters of the acquired \jumbos and
+the resulting occurrence rates. 
 
 %--------------------------------------------------------------------
 \section{The dynamical characterization of \jumbos}
@@ -144,7 +193,7 @@ derived for the cluster by \cite{2016MNRAS.457..313P}.  He determined
 cluster parameters by numerical modeling of the distribution of disk
 sizes observed in the Trapezium cluster, and concluded that this
 distribution is best reproduced for a cluster containing some 2500
-stars with a total mass of $\sim 880$\,\MSun\, and a half-mass radius
+stars with a total mass of $\sim 900$\,\MSun\, and a half-mass radius
 of $\sim 0.5$\,pc. The results were only consistent with the
 observations if the initial cluster density distribution represented a
 fractal dimension of 1.6, and was inconsistent with a
@@ -169,6 +218,17 @@ $\langle M\rangle = 4.73\pm3.48$\,\MJup, and $\langle m\rangle =
 range in projected distances between the two jupiter-mass objects is
 consistent with an orbital separation, and express distances in terms
 of semi-major axis instead.
+For clarification, in figure\,\ref{fig:projected_separation} we present the results of a
+small experiment where we adopt a binary orbit with semi-major axis
+and eccentricity (from the thermal distribution), and project it on
+the sky adopting a random viewing angle.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.4\columnwidth]{figures/projected_separation.pdf}
+         \caption{place holder for now.}
+         \label{fig:projected_separation}
+\end{figure}
 
 To first order, the binding energy of jumbos then ranges between $\sim
 5\cdot 10^{37}$\,erg and $1.4\cdot 10^{41}$\,erg, or at most $\sim
@@ -180,22 +240,23 @@ orbit would be hard for another encountering object of less then
 $17\,M_{\rm Jupiter}$.  For an encountering 1\,\MJup\, object a 25\,au
 orbit would be hard only if the two planets are about three times as
 massive a Jupiter.  The majority of jumbos in the trapezium cluster
-are then soft for any encountering free floating planet, but
-hard if their orbits are tighter, or the encountering free floating
-planet has low mass.
-
-On average, soft encounters tend to soften these binaries even further
-\citep{1975MNRAS.173..729H}, although an occasional soft encounter
-with another planet may actually slightly harden the \jumbo.  A low
-impact-parameter encounter with a star tends to ionize any of the
-observed jumbos.  Independent of how tight the orbit.  \jumbos,
-therefore, are expected to be relatively short lived, and dissociate
-upon a close encounter with any other cluster member.  Once ionized
-they contribute to the population of free floating single objects.
+are then soft for any encountering free floating planet, but hard if
+their orbits are tighter, or the encountering free floating planet has
+low mass.  On average, soft encounters tend to soften these binaries
+even further \citep{1975MNRAS.173..729H}, although an occasional soft
+encounter with another planet may actually slightly harden the \jumbo.
+A low impact-parameter encounter with a star tends to ionize any of
+the observed jumbos.  Independent of how tight the orbit, \jumbos\,
+are expected to be relatively short lived, and dissociate upon a close
+encounter with any other cluster member.  Once ionized they contribute
+to the population of free floating single objects.  Note that in the
+Trapezium cluster, the orbits of 2MASS J11193254-1137466AB, WISE
+1828+2650, and WISE J0336-014 would be hard; they could therefore be
+the fittest survivors of an underlying population.
 
 To further understand the dynamics of the jumbos in a clustered
 environment, and to study the efficiency of the various formation
-scenario's we perform $N$-body calculations of a Trapezium-like star
+scenarios we perform $N$-body calculations of the Trapezium star
 cluster with a population of jupiter-mass objects in various initial
 configurations.
 
@@ -222,12 +283,19 @@ density consistent with Jupiter.
 
 For each of our proposed models, we initialize a population of single
 or binary jupiter-mass objects. The single (and primaries in
-primordial \jumbos) are selected from a power-law mass function between
-0.8\,\MJup\, and 14\,\MJup, which is consisted with the observed mass
-function \citep{2023arXiv231001231P}. We fitted a power-law to the
-primary-planet mass function, which has a slope of $\alpha_{\jumbo}
-=-1.2$ (considearbly flatter than Salpter's $\alpha_{\rm Salpter} =
--2.35$).
+primordial \jumbos) are selected from a power-law mass function
+between 0.8\,\MJup\, and 14\,\MJup, which is consisted with the
+observed mass function \citep{2023arXiv231001231P}. We fitted a
+power-law to the primary-planet mass function, which has a slope of
+$\alpha_{\jumbo} =-1.2$ (considearbly flatter than Salpter's
+$\alpha_{\rm Salpter} = -2.35$).  The first dozen discovered free
+floaters already seemd to have a rather flat mass function
+\cite{2000MNRAS.314..858L}, but the large statistics available through
+gravitational microlensing surveys allowd a reliable estimate of the
+slope, which yields $\alpha = -1.3^{+0.3}_{-0.4}$
+\cite{2011Natur.473..349S}. This mass function is somewhat steeper
+than the slope derived for lower-mass free floaters ($\alpha =
+-0.96^{+0.47}_{-0.27}$ \citep{2023AJ....166..108S}).
 
 For the models with free-floating jupiter-mass objects, scenario
 ${\cal FFC}$, we sprinkle the single planets in the cluster potential
@@ -236,13 +304,12 @@ used for the single stars.  These models were run with
 1200\,jupiter-mass objects (or 600 pairs), but we performed additional
 runs with $10^3$ and $10^4$ free floaters.
 
-primordial \jumbos\, (model ${\cap ISF}$) are initialized with
-semi-major axis with a flat distribution between 10\,au and
-$10^3$\,au, an eccentricity from the thermal distribution between 0
-and 1, and a mass ratio (also from the thermal distribution) between
-0.2 and 1.  The binary is subsequently rotated to a random
-orientation. We typically start with 1200 single or 600 jupiter-mass
-pairs.
+Primordial \jumbos\, (model ${\cal ISF}$) are initialized with
+semi-major axis with a flat distribution between 10\,au and $100$\,au
+(in some cases $10^4$\,au), an eccentricity from the thermal
+distribution between 0 and 1, and a mass ratio (also from the thermal
+distribution) between 0.2 and 1.  The binary is subsequently rotated
+to a random orientation. 
 
 Isolated binaries, for scenario ${\cal ISF}$, are subsequently
 sprinkled in the cluster potential as single objects using the same
@@ -256,9 +323,9 @@ This guarantees a stable planet-moon pair in orbit around the selected
 star.
 
 We selected the star to host such a planet-moon pair from 150 stars
-lower in mass than 0.6\,\MSun\, and 150 more stars. The mid-mass point
-(of 0.6\,\MSun) is almost twice the mean stellar mass in the mass
-function.
+lower in mass than 0.6\,\MSun\, and 150 more massive stars. The
+mid-mass point (of 0.6\,\MSun) is almost twice the mean stellar mass
+in the mass function.
 
 For scenario ${\cal SPP}$, we select the same planet masses as for the
 primordial \jumbos\, except that we have them orbiting one of the
@@ -289,9 +356,37 @@ ${\cal SPM}$ & As bound planet-moon pair orbiting a star\\
 ${\cal FFC}$ & Free floating single planets.\\
 ${\cal ISF}$ & In situ formation of jumbos\\
 \end{tabular}
+In figure\,\ref{Fig:models} we illustrate the four models with a
+schematic diagram.
 
-\subsection{Finding \jumbos\, in the simulations}
+%% \begin{figure}
+%%     \centering
+%% ${\cal SPP}$ \includegraphics[width=.4\columnwidth]{figures/Model_PP.png}
+%% ${\cal SPM}$ ~\includegraphics[width=.4\columnwidth]{figures/Model_PM.png}
+%% ${\cal FFC}$ \includegraphics[width=.4\columnwidth]{figures/Model_SF_FFC.png}
+%% ${\cal ISF}$ ~\includegraphics[width=.4\columnwidth]{figures/Model_SF_FFC.png}
+%%          \caption{}
+%%          \label{Fig:models}
+%% \end{figure}
 
+\begin{picture}(100,250)
+\put(0,150){\includegraphics[width=.4\columnwidth]{figures/Model_PP.png}}
+\put(150,150){\includegraphics[width=.4\columnwidth,angle=90]{figures/Model_PM.png}}
+\put(0,0){\includegraphics[width=.4\columnwidth]{figures/Model_SF_FFC.png}}
+\put(150,0){\includegraphics[width=.4\columnwidth,angle=90]{figures/Model_SF_FFC.png}}
+\put(0,150){${\cal SPP}$}
+\put(150,150){${\cal SPM}$}
+\put(0,0){${\cal FFC}$}
+\put(150,0){${\cal ISF}$}
+\end{picture}
+
+\subsection{Finding \jumbos}
+
+\jumbos\, are soft in terms of the average local kinetic energy of the
+surrounding objects (stars and planets). This complicates the analysis
+of the simulation data. We genrally consider hard binary paris or
+multiples in direct N-body simulations are finding those soft pairs
+requires some extra effort.
 
 \section{Results}
 
@@ -310,22 +405,31 @@ In table\,\ref{Tab:model_PP} we summarize the results of model ${\cal
  \centering 
  \begin{tabular}{lrrrrrrrrrrrr}
    \hline\hline
-   model & $n_{(s,s)}$ & $n_{(s,p)}$ & $n_{p}$ & $n_{(p,p)}$ &  $n_{((s,p),p)}$ & $n_{((p,p),p)}$ & $n_{((p,p),(p,p))}$  \\
+   model & $n_{(s,s)}$ & $n_{(s,p)}$ & $n_{p}$ & $n_{(p,p)}$ \\
         \hline \vspace{-0.75em}\\
-${\cal SPP}$\_Pl\_R025 &  0.0 & 197.6 & 1001 & 0.6 & 0 & 0 & 0 \\
-${\cal SPP}$\_Pl\_R050 &  0.0 & 201.3 &  997 & 0.7 & 0 & 0 & 0 \\
-${\cal SPP}$\_Pl\_R100 &  0.0 & 195.2 & 1003 & 0.7 & 0 & 0 & 0 \\
-${\cal SPP}$\_Fr\_R025 & 71.3 & 43.60 & 1156 & 0.1 & 0 & 0 & 0 \\
-${\cal SPP}$\_Fr\_R050 & 75.2 & 40.00 & 1159 & 0.2 & 0 & 0 & 0 \\
-${\cal SPP}$\_Fr\_R100 & 71.9 & 42.10 & 1157 & 0.1 & 0 & 0 & 0 \\
+%${\cal SPP}$\_Pl\_R025 &  0.0 & 197.6 & 1001 & 0.6 \\
+${\cal SPP}$\_Pr\_R025 &  1.5 & 269.3 &  931 & 0.0 \\ Updated
+${\cal SPP}$\_Pl\_R050 &  0.0 & 201.3 &  997 & 0.7 \\
+${\cal SPP}$\_Pl\_R100 &  0.0 & 195.2 & 1003 & 0.7 \\
+${\cal SPP}$\_Fr\_R025 & 71.3 &  43.6 & 1156 & 0.1 \\
+${\cal SPP}$\_Fr\_R050 & 75.2 &  40.0 & 1159 & 0.2 \\
+${\cal SPP}$\_Fr\_R100 & 71.9 &  42.1 & 1157 & 0.1 \\
  \hline
   \hline \vspace{-0.75em}\\
-${\cal SPM}$\_Pl\_R025 & 0.0 & 62.5 & 115.5 & 511.0 & 0 & 0 & 0 \\
-${\cal SPM}$\_Pl\_R050 & 0.0 & 61.3 & 105.9 & 516.4 & 0 & 0 & 0 \\
-${\cal SPM}$\_Pl\_R100 & 0.0 & 67.0 & 115.0 & 509.0 & 0 & 0 & 0 \\
-${\cal SPM}$\_Fr\_R025 & 67.1 & 19.1 & 975.1 & 102.9 & 0 & 0 & 0 \\
-${\cal SPM}$\_Fr\_R050 & 68.6 & 15.8 & 981.8 & 101.2 & 0 & 0 & 0 \\
-${\cal SPM}$\_Fr\_R100 & 75.0 & 16.4 & 959.4 & 112.1 & 0 & 0 & 0 \\
+${\cal SPM}$\_Pl\_R025 & 0.0  & 62.5 & 116 & 511 \\
+${\cal SPM}$\_Pl\_R050 & 0.0  & 61.3 & 106 & 516 \\
+${\cal SPM}$\_Pl\_R100 & 0.0  & 67.0 & 115 & 509 \\
+${\cal SPM}$\_Fr\_R025 & 67.1 & 19.1 & 975 & 102 \\
+${\cal SPM}$\_Fr\_R050 & 68.6 & 15.8 & 982 & 101 \\
+${\cal SPM}$\_Fr\_R100 & 75.0 & 16.4 & 959 & 112 \\
+  \hline
+  \hline \vspace{-0.75em}\\
+${\cal ISF}$\_Pl\_R025 & 0.75 & 0.0 & 1034.0 & 83.0 & 0 & 0 & 0 \\ Updated
+${\cal ISF}$\_Pl\_R050 & 0.0 & 0.0 & 8.0 & 596.0 & 0 & 0 & 0 \\
+${\cal ISF}$\_Pl\_R100 & 0.0 & 0.0 & 6.8 & 596.6 & 0 & 0 & 0 \\
+${\cal ISF}$\_Fr\_R025 & 55.1 & 25.9 & 763.3 & 205.4 & 0 & 0 & 0 \\
+${\cal ISF}$\_Fr\_R050 & 58.8 & 19.7 & 776.7 & 201.8 & 0 & 0 & 0 \\
+${\cal ISF}$\_Fr\_R100 & 55.5 & 24.3 & 745.1 & 215.3 & 0 & 0 & 0 \\
   \hline
  \end{tabular}
 \end{table*}
@@ -335,35 +439,41 @@ ${\cal SPM}$\_Fr\_R100 & 75.0 & 16.4 & 959.4 & 112.1 & 0 & 0 & 0 \\
  \caption{...}
  \label{Tab:model_PP}
  \centering 
- \begin{tabular}{lrrrrrrrrrrrr}
+ \begin{tabular}{llllll}
  \hline\hline
 model & $\langle M \rangle$ & $\langle m \rangle$ & $\langle a \rangle$ & $\langle e \rangle$ \\
         \hline \vspace{-0.75em}\\
-${\cal SPP}$\_Pl\_R025 & $2.758^{+3.154}_{-0.947}$ & $0.093^{+0.393}_{-0.055}$ & $561.17^{+146.358}_{-326.262}$ & $0.787^{+0.151}_{-0.336}$ \\
-${\cal SPP}$\_Pl\_R050 & $3.58^{+1.877}_{-1.573}$ & $0.027^{+0.232}_{-0.016}$ & $327.159^{+256.131}_{-56.123}$ & $0.788^{+0.13}_{-0.518}$ \\
-${\cal SPP}$\_Pl\_R100 & $3.271^{+1.527}_{-1.971}$ & $0.072^{+0.31}_{-0.042}$ & $491.732^{+176.246}_{-99.821}$ & $0.905^{+0.079}_{-0.167}$ \\
-${\cal SPP}$\_Fr\_R025 & $9.071^{+0.0}_{-0.0}$ & $0.329^{+0.0}_{-0.0}$ & $208.61^{+0.0}_{-0.0}$ & $0.869^{+0.0}_{-0.0}$ \\
-${\cal SPP}$\_Fr\_R050 & $7.157^{+2.107}_{-2.107}$ & $1.438^{+0.67}_{-0.67}$ & $127.444^{+4.673}_{-4.673}$ & $0.568^{+0.215}_{-0.215}$ \\
-${\cal SPP}$\_Fr\_R100 & $9.891^{+0.0}_{-0.0}$ & $4.2^{+0.0}_{-0.0}$ & $147.633^{+0.0}_{-0.0}$ & $0.942^{+0.0}_{-0.0}$ \\
+${\cal SPP}$\_Pl\_R025 & \\%%%%$2.8^{+3.2}_{-0.9}$ & $0.09^{+0.39}_{-0.06}$  & $561^{+146}_{-326}$ & $0.79^{+0.15}_{-0.34}$ \\
+${\cal SPP}$\_Pl\_R050 & $3.6^{+1.9}_{-1.63}$ & $0.03^{+0.23}_{-0.02}$ & $327^{+256}_{-56}$  & $0.79^{+0.13}_{-0.52}$ \\
+${\cal SPP}$\_Pl\_R100 & $3.31^{+1.5}_{-2.0}$ & $0.02^{+0.31}_{-0.04}$ & $492^{+176}_{-100}$ & $0.91^{+0.08}_{-0.17}$ \\
+${\cal SPP}$\_Fr\_R025 & $9.1^{+0.0}_{-0.0}$ & $0.33^{+0.0}_{-0.0}$   & $209^{+0.0}_{-0.0}$ & $0.87^{+0.0}_{-0.0}$ \\
+${\cal SPP}$\_Fr\_R050 & $7.27^{+2.1}_{-2.1}$ & $1.44^{+0.67}_{-0.67}$ & $127^{+5}_{-6}$    & $0.57^{+0.22}_{-0.22}$ \\
+${\cal SPP}$\_Fr\_R100 & $9.9^{+0.0}_{-0.0}$ & $4.20^{+0.0}_{-0.0}$    & $148^{+0.0}_{-0.0}$ & $0.94^{+0.0}_{-0.0}$ \\
   \hline \vspace{-0.75em} \\ 
-${\cal SPM}$\_Pl\_R025 & $2.712^{+3.017}_{-1.349}$ & $0.706^{+1.005}_{-0.4}$ & $223.178^{+84.484}_{-91.249}$ & $0.088^{+0.167}_{-0.046}$ \\
-${\cal SPM}$\_Pl\_R050 & $2.563^{+3.159}_{-1.224}$ & $0.712^{+0.966}_{-0.401}$ & $217.699^{+89.894}_{-86.283}$ & $0.087^{+0.175}_{-0.048}$ \\
-${\cal SPM}$\_Pl\_R100 & $2.525^{+3.109}_{-1.193}$ & $0.671^{+0.931}_{-0.364}$ & $215.788^{+87.311}_{-86.68}$ & $0.086^{+0.178}_{-0.047}$ \\
-${\cal SPM}$\_Fr\_R025 & $3.274^{+3.935}_{-1.714}$ & $0.806^{+1.241}_{-0.448}$ & $132.06^{+105.772}_{-69.993}$ & $0.392^{+0.249}_{-0.214}$ \\
-${\cal SPM}$\_Fr\_R050 & $3.495^{+3.932}_{-1.748}$ & $0.873^{+1.17}_{-0.52}$ & $129.134^{+105.546}_{-62.476}$ & $0.445^{+0.261}_{-0.23}$ \\
-${\cal SPM}$\_Fr\_R100 & $3.285^{+3.594}_{-1.743}$ & $0.862^{+1.108}_{-0.494}$ & $137.343^{+107.719}_{-72.077}$ & $0.398^{+0.279}_{-0.207}$ \\
-  \hline
+${\cal SPM}$\_Pl\_R025 & $2.7^{+3.0}_{-1.3}$ & $0.71^{+1.01}_{-0.4}$ & $223^{+84}_{-91}$ & $0.09^{+0.17}_{-0.05}$ \\
+${\cal SPM}$\_Pl\_R050 & $2.6^{+3.2}_{-1.2}$ & $0.71^{+0.97}_{-0.40}$ & $218^{+90}_{-86}$ & $0.09^{+0.18}_{-0.05}$ \\
+${\cal SPM}$\_Pl\_R100 & $2.5^{+3.1}_{-1.2}$ & $0.67^{+0.93}_{-0.36}$ & $216^{+87}_{-87}$ & $0.08^{+0.18}_{-0.05}$ \\
+${\cal SPM}$\_Fr\_R025 & $3.34^{+3.9}_{-1.7}$ & $0.81^{+1.24}_{-0.45}$ & $132^{+106}_{-70}$ & $0.39^{+0.25}_{-0.21}$ \\
+${\cal SPM}$\_Fr\_R050 & $3.5^{+3.9}_{-1.7}$ & $0.87^{+1.17}_{-0.52}$ & $129^{+106}_{-62}$ & $0.45^{+0.26}_{-0.23}$ \\
+  ${\cal SPM}$\_Fr\_R100 & $3.3^{+3.6}_{-1.7}$ & $0.86^{+1.11}_{-0.49}$ & $137^{+108}_{-72}$ & $0.40^{+0.28}_{-0.21}$ \\
+  \hline \vspace{-0.75em} \\ 
+${\cal ISF}$\_Pl\_R025 & $4.09^{+3.81}_{-1.92}$ & $0.99^{+1.43}_{-0.65}$ & $120.79^{+189.53}_{-68.11}$ & $0.65^{+0.16}_{-0.22}$ \\ Updated
+${\cal ISF}$\_Pl\_R050 & $3.197^{+3.543}_{-1.583}$ & $0.835^{+1.241}_{-0.5}$ & $55.3^{+22.297}_{-21.279}$ & $0.632^{+0.143}_{-0.184}$ \\
+${\cal ISF}$\_Pl\_R100 & $3.225^{+3.597}_{-1.54}$ & $0.856^{+1.161}_{-0.527}$ & $54.543^{+22.321}_{-21.768}$ & $0.638^{+0.142}_{-0.184}$ \\
+  ${\cal ISF}$\_Fr\_R100  & $3.2^{+3.6}_{-1.5}$ & $0.86^{+1.16}_{-0.527}$ & $54.5^{+22.3}_{-21.8}$ & $0.64^{+0.14}_{-0.18}$ \\
+${\cal ISF}$\_Fr\_R025 & $3.773^{+4.033}_{-1.91}$ & $1.0^{+1.389}_{-0.599}$ & $44.181^{+28.484}_{-19.677}$ & $0.642^{+0.16}_{-0.213}$ \\
+${\cal ISF}$\_Fr\_R050 & $3.772^{+4.143}_{-1.883}$ & $1.039^{+1.482}_{-0.655}$ & $43.6^{+27.754}_{-18.754}$ & $0.642^{+0.153}_{-0.2}$ \\
+${\cal ISF}$\_Fr\_R100 & $3.543^{+3.849}_{-1.798}$ & $0.94^{+1.472}_{-0.585}$ & $44.906^{+24.624}_{-21.073}$ & $0.624^{+0.173}_{-0.183}$ \\
  \end{tabular}
 \end{table*}
 
 The ${\cal SPP}$ model calculations fail to reproduce the observed
-population of \jumbos. The number of \jumbos\, is too low by about a
-factor 100, and their orbital separations too large.  The fractal
-initial conditions produce even less \jumbos\, although the few that
-formed have considerably smaller orbital separations.  Changing the
-initial distribution in semi-major axis of the inner orbit from a
-uniform distribution to a logarithmic distribution reduces the
-formation rate of \jumbos\, even further.
+population of \jumbos\, by a factor of 50 to 400.  The fractal initial
+conditions produce even less \jumbos\, than the plummer models,
+although the few that formed have considerably smaller orbital
+separations.  Changing the initial distribution in semi-major axis of
+the inner orbit from a uniform distribution to a logarithmic
+distribution reduces the formation rate of \jumbos\, even further.
 
 To further explore the failure of model ${\cal SPP}$, we perform an
 additional series of simulations with pre-determined inner and outer
@@ -377,9 +487,9 @@ separation $a_2-a_1 = 200$\,au, expecting those to lead to consistent
 results in comparison with the observations.  The results of these
 simulations are presented in figure\,\ref{Fig:fjumbos_from_PP}.
 
-For these models the \jumbo\, formation efficiency peaks for an
-orbital separation $a_1 \apgt 1000$\,au, but steeply drops for smaler
-values of $a_1$. As proposd by \cite{2023arXiv231006016W}, we adopt an
+For these models the \jumbo-formation efficiency peaks for an orbital
+separation $a_1 \apgt 1000$\,au, but steeply drops for smaller values
+of $a_1$. As proposd by \cite{2023arXiv231006016W}, we adopt a
 difference in the initial orbital distance of about $a_2-a_1 =
 100$\,au or 200\,au (see figure\,\ref{Fig:fjumbos_from_PP}), which
 would lead to \jumbo\, orbits in the same range.  We performed a total
@@ -389,6 +499,16 @@ produced a total of 910 \jumbos. The initial mean value of $a_1-a_2 =
 $a_j \sim 262\pm45$\,au.  The claim made by
 \cite{2023arXiv231006016W}, that the separation distance $a_2-a_1$
 leads to \jumbos\, with a similar orbital distance seems reasonable.
+
+The rate, derived by \cite{2023arXiv231006016W}, however, appears to
+be orders of magnitude smaller than they expected.  They calculate the
+rate by means of 4-body scattering experiments, in which a star with
+two equal-mass planets with semi-major axes $a_1$ for the inner and
+$a_2$ for the other planet, encounters a single star. Their largest
+cross section of roughly $a_1^2$ is obtained if the encounter velocity
+$0.8v_\star/v_1$. For an encounter at the cluster's velocity
+dispersion, the inner planet would then have a orbital separation of
+about 900\,au around a 1\,\MSun\, star.
 
 \begin{figure}
     \centering
@@ -411,23 +531,34 @@ leads to \jumbos\, with a similar orbital distance seems reasonable.
 In the ${\cal SPM}$ models we initialize planet pairs (or planet with
 moons) in orbit around a star. The planet-moon system orbit was
 selected to mimic the observed distribution of \jumbos\, and therefore
-are generally rather wide. To warrant stability of the
-star-planet-moon system, we chose an orbital separation such that the
-planet-moon pair stays witin 1/3th of it's Hill radius in orbit around
-the star. As a consequence, these systems are generally rather wide,
-and therefore fragile for being stripped in encounters with other
-stars.  This is reflected in the rate and orbital parameters of the
+are generally rather wide ($a \sim 200$\,au). But we adopted
+relatively circular orbits ($e<0.02$) for the planet-moon pair.  To
+warrant stability of the star-planet-moon system, we chose an orbital
+separation such that the planet-moon pair stays witin 1/3th of it's
+Hill radius in orbit around the star. As a consequence, these systems
+are generally rather wide, and therefore fragile for being stripped in
+encounters with other stars. At the same time, the planet-moon pairs
+tend to be soft, much in the same way as the observed \jumbos\, are
+soft. This is reflected in the rate and orbital parameters of the
 \jumbos\, resulting from model ${\cal SPM}$.
 
-The primary mass and orbital separation of the jumbos is quite
-consistent with the observations, but the secondary masses tend to be
-small. Although the denser Plummer models ($_{\rm vir} = 0.25$\,pc
-produces the widest \jumbos, although with the wide range one can
-doubt it's significance. The fractal initial models have the tenency
-to produce smaller separations between the planet pairs, and lower
-eccentricities.
+In model ${\cal SPM}$ we find an abundance of \jumbos\, with about 500
+per cluster when we start with a Plummer distribution, and about 100
+for the fractal models (starting with 600 pairs). The lower frequency
+for the fractal models reflects the more dynamic environment in which
+\jumbos\, are easily ionized. This trend is also noticeable in the
+number of stellar binaries and free floating planets, but also in the
+\jumbo\, orbital parameters. \jumbos\, originating from the Plummer
+models tend to be rather circular and somewhat wider than those
+surviving in the fractal model.  These trends are indepenedend of the
+cluster density (or virial radius). We do expect some difference in
+the \jumbo\, population as a fuction of the initial cluster density,
+but the distribution \jumbo\, parameters in the simulations are wide
+and they probaby do not form the right population to make such a
+distinction.
 
 \subsection{Model ${\cal FFC}$}
+
 
 \subsection{Model ${\cal ISF}$}
 
@@ -480,6 +611,13 @@ star.
 \section{Discussion}
 
 
+\cite{2023arXiv231015603C} argued that \jumbos potentially originate
+from tilted circum-binary planets. Formed as a --sort-of-- planet-moon
+system in a wide orbit around a star, that is strippied from the host
+star by the cluster potential or a relatively wide encounter with
+another star. 
+
+
 Single free floating planetary objects were discovered in abundance
 (between 70 and 170 candidates) before in the Upper Scorpius
 association \cite{2022NatAs...6...89M}, but these were considered to
@@ -487,22 +625,11 @@ be single.  With an age of about 11\,Myr \cite{++}, Upper Scorpio is
 expected to be rich in single jupiter mass free floating planets, but
 binaries will be rare as these have been broken.
 
-
-
-They calculate the rate by means of 4-body scattering experiments, in
-which a star with two equal-mass planets with semi-major axes $a_1$
-for the inner and $a_2$ for the other planet, encounters a single
-star. Their largest cross section of roughly $a_1^2$ is obtained if
-the encounter velocity $0.8v_\star/v_1$. For an encounter at the
-cluster's velocity dispersion, the inner planet would then have a
-orbital separation of about 900\,au around a 1\,\MSun\, star.
-
-The orbital separation of the eventual jumbo would then be comparable
-to the difference in orbital separation between the two planets
-($a_{\rm Jumbo} \simeq a_2-a_1$).
-
-The model in which \jumbos\, form a natural byproduct of the low-mass
-end of the star-formation process
+The orbital parameters of the \jumbos\, hardly seem to depend on the
+cluster density (or virial radius). We do expect some difference in
+the \jumbo\, population as a fuction of the initial cluster density,
+but the distribution \jumbo\, parameters are wide and they probaby do
+not form the right population to make such a distinction.
 
 \subsection{The failure of model ${\cal SPP}$}
 
@@ -547,21 +674,176 @@ the formation rate of jumbos from their adopted initial conditions.
 \subsection{\jumbos\, as primoridal low-mass object pairs, model {\cal SPP}}
 
 
+Recently 
+70 to 170 candidates) before in the 10\,Myr old association
+Upper Scorpius \cite{2022NatAs...6...89M}, but these were considered
+to be single. 
+
+\subsubsection{Further constraining the initial conditions}
+Using the results of the general models, we alter our initial
+conditions with the aim of mimicking observations. Doing so allows us
+to disentangle aspects of the cluster history, allowing for
+predictions on the properties of JuMBO formation. These runs
+correspond to the middle segment of table \ref{Tab:SF_FF_Params}.
+    
+For all models, we constrain $N_{\mathrm{JuMBO}} + N_{\mathrm{FF}}$ to
+values reflecting the total planetary-mass population observed in
+\citet{2023arXiv231001231P}, keeping in mind the survival rate of
+JuMBO systems based on previous results to decide on the initial value
+of $N_{\mathrm{JuMBO}}$. The range of mass ratio and mass value
+remains unchanged. However, now the mass ratio follows a thermal
+distribution to reflect the abundance of $q=1$ observations, whilst
+the mass of the objects follows a power-law distribution with $\alpha
+= -1.2$. The semi-major axis is uniformly distributed between the
+restricted range $a\in[25,100]$ au. Here, the lower bound reflects the
+restrictions of observational resolution in the original study
+\citep{2023arXiv231001231P}.
+    
+Models `F050C' and `F0FFOC' look at scenarios where the initial JuMBO
+population has an eccentricity ranging between $e\in[0,0.2]$ sampled
+from a uniform distribution. For all other models, the eccentricity
+remains thermalised and ranges between $e\in[0,0.9]$.
+ 
+\begin{table}
+  \caption{Initial conditions of the various configurations. The
+    nomenclature is as follows: The first letter identifies the
+    cluster distribution. The number denotes the initial virial
+    radius, `FF' denotes the presence of Jupiter-mass free floaters,
+    `x' whether the system contains an abundance (excessive/extra)
+    amount of these free floaters, `O' denotes systems whose JuMBOs
+    have their initial parameters constrained by the observational
+    data and finally `C', systems whose initialised JuMBOs are on
+    circular orbits. Column 1: The model used. Column 2: The number of
+    simulations for the given configuration. Column 3: The initial
+    virial radius of the system. Column 4: The number of initialised
+    JuMBOs. Column 5: The number of initialised free floaters.}
+        \label{Tab:SF_FF_Params}
+        \centering 
+        \begin{tabular}{c c c c c c}
+        \hline\hline
+        Model & $N_{\mathrm{runs}}$ & $R_{\mathrm{vir}}$ [pc] & $N_{\mathrm{JuMBO}}$ & $N_{\mathrm{FF}}$\\
+        \hline \vspace{-0.75em}\\ 
+           F05     & $20$ & $0.5$ & $500$ & $0$ \\
+           F05FF   & $20$ & $0.5$ & $500$ & $500$ \\
+           F1      & $20$ & $1.0$ & $500$ & $0$ \\
+           P05     & $20$ & $0.5$ & $500$ & $0$ \\
+           P05FF   & $20$ & $0.5$ & $500$ & $500$ \\
+           P1      & $20$ & $1.0$ & $500$ & $0$ \\
+           \hline
+           \hline \vspace{-0.75em}\\
+           F05O   & $10$ & $0.5$ & $275$ & $0$ \\
+           F05FFO & $10$ & $0.5$ & $170$ & $400$ & \\
+           F05OC   & $10$ & $0.5$ & $275$ & $0$ \\
+           F05FFOC & $10$ & $0.5$ & $170$ & $400$ & \\
+           P05FFO   & $10$ & $0.5$ & $60$  & $500$ \\
+           \hline
+           \hline \vspace{-0.75em}\\
+           F05FFxJ & $5$ & $0.5$ & $500$ & $10^{4}$ \\
+           F05FFx  & $5$ & $0.5$ & $0$   & $10^{4}$\\
+         \hline                                   %inserts single line
+        \end{tabular}
+     \end{table}
+
 
 %--------------------------------------------------------------------
 \section{Conclusion}
 
-\cite{2023arXiv231015603C} argued that \jumbos potentially originate
-from tilted circum-binary planets. Formed as a --sort-of-- planet-moon
-system in a wide orbit around a star, that is strippied from the host
-star by the cluster potential or a relatively wide encounter with
-another star. 
+The discovery of relatively wide pairs of jupiter-mass planetary
+objects in the Trapezium cluster emphasizes our limited understanding
+of low-mass star and planet formation. In order to derive
+characteristcs for their origin we performed simulations of
+Trapezium-equivalent stellar clusters (2500 stars with a virialized
+$\sim 0.5$\,pc radius) with various compositions of planetary objects
+and stars.
 
+Models in which planets form in wide circum-stellar orbits, as
+proposed by \cite{2023arXiv231006016W}, produce many single free
+floating planets, but an insufficient number of planet pairs per
+cluster. The ratio of single to pairs of planets is too low by a
+factor of 60 to 400.
+
+The models in which pairs of planetary-mass objects orbit stars in the
+form of a planet-moon system, produce many free floating planetary
+pairs, and in the proper range of orbits.  In particular the models
+that start with fractal initial conditions tend to produce a fraction
+of jumbos of among free floating planets ${\cal O}(0.1)$, which is
+close to the observed value of $0.078\pm0.012$.  The absolute numbers
+are a bit high though, by a factor of two, but that is easily solved
+by starting with fewer systems.  Although the distribution in orbital
+separation matches the observations by constructing the initial
+conditions appropriately, these models prediction rather
+low-eccentricities ($e\aplt 0.4$).
+
+For the model to produce a sufficient number of \jumbos\, it requires
+planet-moon pairs form in $\apgt 1000$\,au orbits around their parent
+star. Such wide orbits are exotic considering the fact that the
+circum-stellar disks observed in the Trapezium cluster tend to be
+smaller than 400\,au. We therefore do not see how such wide
+planet-moon pairs can form around stars.
+
+Starting with a enormous population of ($\apgt 10^4$) isolated
+free-floating planetary mass objects among the stars would grossly
+overproduce the expected number of free floaters, which is not
+observed, and still fails to reproduce the observed number of \jumbos.
+This model, however, naturally leads to a mass-ratio distribution
+skewed to unity, as is observed. We consider this model undesireable
+by the lack of a large ($\apgt 10^4$) population of free floating
+planets in the Trapezium cluster.
+
+Ruling out models ${\cal SPP}$, ${\cal SPM}$ and ${\cal FFC}$, we are
+left with the simplest and most satisfactory solution in which
+\jumbos\, form together with the single stars in the cluster.  This
+model does not only reproduce the observed rates, it can subsequently
+also be used to further constrain the initial conditions of \jumbos.
+
+In the Plummer models, 80\% of \jumbos\, are ionized within 1\,Myr.
+The observed population of free floaters and \jumbos\, can then be
+reproduced if the cluster was born with some 500 free floating
+jupiter-mass planets and $\sim 50$\,\jumbos. The current observed
+primary and secondary masses of \jumbos\, would then still reflect the
+conditions at birth, but the semi-major axis and eccentricity
+distributions would have been affected by encounters with other
+cluster members. These processes tend to drive the eccentricity
+distribution to resemble the thermal distribution (probably with an
+excess of high ($\apgt 0.8$) eccentricities \cite{SPZMcM2000}. The
+semi-major axes of the jumbos would have widened, on average by
+approximately 5\% due to encounters with other cluster members
+(mainly stars and free-floating planets).
+
+Alternative to a Plummer initial stellar distribution we experimented
+with fractal distributions, which also satisfactorily reproduces the
+observed populations. In the fractal models, $\sim 90$\,\% of the
+priordial \jumbos\, become ionized, and in principle the entire
+observed populations of free-floating jupiter mass objects and
+\jumbos\, can be explained by a single population of primordial
+\jumbos. We then conclude that single jupiter mass objects are
+preferentially born in pars with a rather flat distribution in orbital
+separations with a maximum of about 100\,au or 200\,au.
+
+This model satisfactorily explains the observed orbital separation
+distribution, with a $\sim 15$\% excess of systems with a separation
+$\apgt 400$\,au. We do expect a rich population of orbits with
+separation smaller than the observed 25\,au, possibly down to sub-au
+scales.  The masses of the primaries in the planet pairs, and the
+mass-ratio distribution are then hardly affected by the past $\sim
+1$\,Myr evolution of the Trapezium cluster.
+
+We have a slight preference for the ${\cal ISF}$ fractal models with
+0.5\,pc virial radius because hierarchical triple planets form
+naturally in roughly the observed proportion (on average 4 triples
+among $\sim 40$ pairs and $\sim 500$ single planets). The singles then
+originate from broken up pairs, and the trples form in interactions
+between two planet pairs. The dynamical formation of soft triple
+planets is quite remarkable, and observational follow-up would be of
+considerable interest.
+
+We conclude that the observed \jumbos\, in the Trapezium cluster
+formed as planetary pairs together with the other stars.
 
 \section*{Acknowledgements}
 
 Veronica Saz Ulibarrena, Shuo Huang, Maite Wilhelm, Brent Maas,
-Fred Rasio
+Fred Rasio, Alvaro Hacar.
     
 \input /home/spz/Latex/lib/bib/references
     
