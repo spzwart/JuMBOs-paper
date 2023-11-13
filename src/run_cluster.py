@@ -13,6 +13,7 @@ from make_jumbos import make_outer_planetary_systems
 from make_jumbos import make_isolated_jumbos
 from make_jumbos import make_arXiv2310_06016
 from make_jumbos import make_jumbo_as_planetmoon_pair
+from make_jumbos import make_singletons
 
 def ZAMS_radius(mass):
     log_mass = numpy.log10(mass.value_in(units.MSun))
@@ -21,7 +22,6 @@ def ZAMS_radius(mass):
     beta  = 0.01291 + 0.2226*log_mass
     gamma = 0.1151 + 0.06267*log_mass
     r_zams = pow(mass.value_in(units.MSun), 1.25) * (0.1148 + 0.8604*mass_sq) / (0.04651 + mass_sq)
-
     return r_zams | units.RSun
 
 def merge_two_stars(bodies, particles_in_encounter):
@@ -32,12 +32,18 @@ def merge_two_stars(bodies, particles_in_encounter):
     new_particle.position = com_pos
     new_particle.velocity = com_vel
     new_particle.radius = particles_in_encounter.radius.sum()
-    if "jumbos" in bodies.name:
-        print("Merge with jumbos")
-        new_particle.name = "jumbos"
+    if "jumbos" in particles_in_encounter.name:
+        print("Merge with jumbo: ", particles_in_encounter.name, "M=", particles_in_encounter.mass.in_(units.MJupiter))
     else:
-        print("Merge two stars")
+        print("Merge with stars: ", particles_in_encounter.name, "M=", particles_in_encounter.mass.in_(units.MJupiter))
+
+    if new_particle.mass>=0.08|units.MSun:
         new_particle.name = "star"
+        new_particle.radius = ZAMS_radius(new_particle.mass)
+    else:
+        new_particle.name = "jumbos"
+        rho = (1|units.MJupiter)/(1|units.RJupiter)**3 
+        new_particle.radius = (new_particle.mass/rho)**(1./3.)
     bodies.add_particles(new_particle)
     bodies.remove_particles(particles_in_encounter)
 
@@ -88,10 +94,14 @@ def resolve_supernova(supernova_detection, bodies, time):
 
 def make_initial_cluster(Nstars, Njumbos, Rvir, Fd, jumbo_model,
                          a1=800|units.au, a2=1000|units.au,
+                         x=-2.0, mmin=0.3|units.MJupiter,
                          jumbo_mass_function=True):
 
+    if jumbo_model=="singletons":
+        return make_singletons(Nstars, Njumbos, Rvir, Fd, x, mmin)
+
     N = Nstars
-    if jumbo_model=="freefloaters":    
+    if jumbo_model=="freefloaters":
         N = Nstars + int(Njumbos/2)
 
     Mmin = 0.08 | units.MSun
@@ -108,17 +118,7 @@ def make_initial_cluster(Nstars, Njumbos, Rvir, Fd, jumbo_model,
     bodies.name = "star"
     bodies.type = "star"
     bodies.radius = ZAMS_radius(bodies.mass)
-    if jumbo_model=="singletons":
-        JuMBOs = bodies.random_sample(Njumbos)
-        JuMBOs.mass = new_salpeter_mass_distribution(Njumbos,
-                                                     0.8|units.MJupiter,
-                                                     14|units.MJupiter, alpha=-1.2)
-        JuMBOs.name = "jumbos"
-        JuMBOs.type = "planet"
-        JuMBOs.radius = 1 | units.RJupiter
-        bodies.scale_to_standard(convert_nbody=converter)
-        bodies.move_to_center()
-    elif jumbo_model=="freefloaters":
+    if jumbo_model=="freefloaters":
         JuMBOs = bodies.random_sample(Njumbos)
         JuMBOs.mass = new_salpeter_mass_distribution(Njumbos,
                                                      0.8|units.MJupiter,
@@ -130,7 +130,7 @@ def make_initial_cluster(Nstars, Njumbos, Rvir, Fd, jumbo_model,
         JuMBOs.m2 = JuMBOs.mass * (1-q)
         bodies.scale_to_standard(convert_nbody=converter)
         bodies.move_to_center()
-        jumbos = make_isolated_jumbos(bodies)
+        jumbos = make_isolated_jumbos(bodies, a1, a2)
         bodies.remove_particles(JuMBOs)
     else:
         bodies.scale_to_standard(convert_nbody=converter)
@@ -178,7 +178,7 @@ def  run_cluster(bodies, Rvir, t_end, dt):
     """
 
     converter=nbody_system.nbody_to_si(bodies.mass.sum(), Rvir)
-    gravity = ph4(converter, number_of_workers=2)
+    gravity = ph4(converter, number_of_workers=5)
     #gravity = Petar(converter)#, mode="gpu")#, number_of_workers=6)
     #gravity = Petar(converter, mode="gpu")#, number_of_workers=6)
     #print(gravity.parameters)
@@ -201,28 +201,26 @@ def  run_cluster(bodies, Rvir, t_end, dt):
     dE_coll = zero
     time = zero
 
-    dt_diag = min(dt, 0.1|units.Myr)
-    diag_time = time
+    dt_diag = dt
+    diag_time = dt_diag
     while time < t_end:
 
         print(f"Time steps: {dt.in_(units.Myr)} time= {time.in_(units.Myr)}")
         time += dt
 
-        channel_to_gd.copy_attributes(["mass", "radius", "vx", "vy", "vz"])
-        E_dyn = gravity.kinetic_energy  + gravity.potential_energy 
-        gravity.evolve_model(time)
-        dE_dyn = E_dyn - (gravity.kinetic_energy  + gravity.potential_energy)
-
-        resolve_collision(collision_detection, gravity, bodies)
-        channel_from_gd.copy()
-
-        time = gravity.model_time
-
+        while gravity.model_time<time:
+            channel_to_gd.copy()
+            E_dyn = gravity.kinetic_energy  + gravity.potential_energy 
+            gravity.evolve_model(time)
+            dE_dyn = E_dyn - (gravity.kinetic_energy  + gravity.potential_energy)
+            resolve_collision(collision_detection, gravity, bodies)
+            channel_from_gd.copy()
+            
         print_diagnostics(time, bodies.mass.sum(), E_dyn, dE_dyn, dE_coll)
-
         
         sys.stdout.flush()
         if diag_time <= time:
+            diag_time += dt_diag
             print("Diagnostics:", time.in_(units.Myr), "N=", len(bodies))
             Rv = bodies.virial_radius()
             SMBH = bodies[bodies.name=="SMBH"]
@@ -232,7 +230,6 @@ def  run_cluster(bodies, Rvir, t_end, dt):
                   RL[-4].value_in(units.pc),
                   RL[-3].value_in(units.pc))
             index += 1
-            diag_time += dt_diag
             filename = "jumbos_i{0:04}.amuse".format(index)
             write_set_to_file(bodies, filename, 'hdf5',
                               close_file=True, overwrite_file=False)
@@ -247,7 +244,7 @@ def print_diagnostics(time, Mtot, Etot, dE_dyn, dE_coll):
     print("M=", Mtot.in_(units.MSun), end=' ') 
     print("E= ", Etot, end=' ') 
     print("dE(dyn)=", dE_dyn/Etot, end=' ') 
-    print("dE(coll)=", dE_coll/Etot, end=' ') 
+    print("dE(coll)=", dE_coll/Etot) 
     
 def new_option_parser():
     from amuse.units.optparse import OptionParser
@@ -261,6 +258,12 @@ def new_option_parser():
     result.add_option("--dt", unit=units.Myr,
                       dest="dt", type="float",default = 0.1|units.Myr,
                       help="output timesteps [%default]")
+    result.add_option("-x", 
+                      dest="x", type="float",default = -2.0,
+                      help="mass function slope [%default]")
+    result.add_option("--mmin", unit=units.MJupiter,
+                      dest="mmin", type="float",default = 0.3|units.MJupiter,
+                      help="mass function minimum [%default]")
     result.add_option("-R", unit=units.parsec,
                       dest="Rvir", type="float",default = 0.5 | units.pc,
                       help="cluser virial radius [%default.value_in(units.parsec)]")
@@ -284,6 +287,6 @@ if __name__ in ('__main__', '__plot__'):
     o, arguments  = new_option_parser().parse_args()
 
     bodies = make_initial_cluster(o.Nstars, o.Njumbos, o.Rvir, o.Fd, o.jumbo_model,
-                                  o.a1, o.a2, o.jumbo_mass_function)
+                                  o.a1, o.a2, o.x, o.mmin, o.jumbo_mass_function)
     run_cluster(bodies, o.Rvir, o.t_end, o.dt)
 

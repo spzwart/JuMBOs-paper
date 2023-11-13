@@ -20,6 +20,17 @@ from amuse.ext.orbital_elements import get_orbital_elements_from_arrays
                                                  
 import random
 
+def check_paired_planets(planets):
+
+    pairs = Particles()
+    for ji in planets:
+        d = (planets.position-ji.position).lengths()
+        d = np.sort(d)[1]
+        if d<(1000| units.au):
+            ji.d = d
+            pairs.add_particle(ji)
+    return pairs
+
 from matplotlib import pyplot as plt
 def orbital_elements_of_binary(primary, secondary):
     b = Particles(1)
@@ -170,35 +181,51 @@ def print_planetary_orbits(bodies):
     print(ecc)
     plt.scatter(sma.value_in(units.au), ecc, c='b')
     plt.show()
-    
-def plot_snapshot(bodies):
 
-    jumbos = bodies[bodies.name=="jumbos"]
-    hosts = bodies[bodies.name=="host"]
-    stars = bodies - hosts - jumbos
-    print(f"number of stars={len(stars)}, hosts={hosts}, jumbos={len(jumbos)}")
+def plot_snapshot(bodies, verbose, time=0| units.Myr, figname=None):
     
-    #bound_jumbos = find_jumbo_orbits(bodies.copy())
-    #triples = find_host_stellar_companion(bound_jumbos, stars+hosts)
-    #print_planetary_orbits(bodies.copy())
+    fig = pyplot.figure(figsize=(8,8))
+    pyplot.rcParams.update({'font.size': 22})
+    mplanet = 50 | units.MJupiter
+    planets = bodies[bodies.mass<mplanet]
+    stars = bodies - planets
+
+    if verbose==3:
+        bound_jumbos = find_jumbo_orbits(bodies.copy())
+        triples = find_host_stellar_companion(bound_jumbos, stars+hosts)
+        print_planetary_orbits(bodies.copy())
     
-    m = 100*stars.mass/stars.mass.max()
+    m = 100*np.sqrt(stars.mass/stars.mass.max())
+    c = stars.mass.value_in(units.MSun)**2
     pyplot.scatter(stars.x.value_in(units.parsec), stars.y.value_in(units.parsec),
-                   s=m, label="single stars", c='k', alpha= 0.2)
-    if len(hosts)>0:
-        m = 100*hosts.mass/hosts.mass.max()
-        pyplot.scatter(hosts.x.value_in(units.parsec),
-                       hosts.y.value_in(units.parsec),
-                       s=m, c='b', label="host stars")
-    if len(jumbos)>0:
-        m = 10*jumbos.mass/jumbos.mass.max()
-        pyplot.scatter(jumbos.x.value_in(units.parsec), jumbos.y.value_in(units.parsec),
-                       s=m, c='r', label="jumbos")
+                   s=m, label="stars", c=c, cmap="bone", alpha= 0.3)
+    jupiters = planets[planets.mass>=1|units.MJupiter]
+    m = 10*np.sqrt(jupiters.mass/jupiters.mass.max())
+    earthers = planets - jupiters
+    pyplot.scatter(jupiters.x.value_in(units.parsec), jupiters.y.value_in(units.parsec),
+                   s=m, c='r', label="Jupiter-like planets")
+    pyplot.scatter(earthers.x.value_in(units.parsec), earthers.y.value_in(units.parsec),
+                   s=0.1, c='k', label="Earth-like planets")
+
+    if verbose==2:    
+        pairs = check_paired_planets(jupiters)
+        print(f"number of stars={len(stars)}, jumbos={len(pairs)}, jupiters={len(jupiters)}, Earthers={len(earthers)}")
+
+        if len(pairs)>0:
+            pyplot.scatter(pairs.x.value_in(units.parsec), pairs.y.value_in(units.parsec),
+                           s=30, c=pairs.d.value_in(units.au), cmap="turbo",
+                           label="jumbos")
+        pyplot.title(f"t={time.value_in(units.Myr):2.3f}Myr, N={len(pairs)}")
+    else:
+        pyplot.title(f"t={time.value_in(units.Myr):2.3f}Myr")
+    
     pyplot.xlabel('X [pc]')
     pyplot.ylabel('Y [pc]')
-    pyplot.legend()
-  
+    #pyplot.legend()
+    if not figname == None:
+        pyplot.savefig(figname)
     pyplot.show()
+    pyplot.close()
 
 def new_option_parser():
     from amuse.units.optparse import OptionParser
@@ -206,6 +233,9 @@ def new_option_parser():
     result.add_option("-f", 
                       dest="filename", default = "jumbos_i0000.amuse",
                       help="input filename [%default]")
+    result.add_option("--verbose", 
+                      dest="verbose", type="int", default = 1,
+                      help="plotted verbosity [%default]")
     return result
     
 if __name__=="__main__":
@@ -213,5 +243,5 @@ if __name__=="__main__":
 
     stars = read_set_from_file(o.filename)
     print(stars)
-    plot_snapshot(stars)
+    plot_snapshot(stars, o.verbose)
 

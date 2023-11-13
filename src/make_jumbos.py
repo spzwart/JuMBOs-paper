@@ -3,6 +3,19 @@ from numpy import random
 from amuse.lab import *
 from amuse.ext.orbital_elements import generate_binaries, new_binary_from_orbital_elements
 from amuse.ic import make_planets_oligarch
+from amuse.community.fractalcluster.interface import new_fractal_cluster_model
+import random
+
+
+def ZAMS_radius(mass):
+    log_mass = numpy.log10(mass.value_in(units.MSun))
+    mass_sq = (mass.value_in(units.MSun))**2
+    alpha = 0.08353 + 0.0565*log_mass
+    beta  = 0.01291 + 0.2226*log_mass
+    gamma = 0.1151 + 0.06267*log_mass
+    r_zams = pow(mass.value_in(units.MSun), 1.25) * (0.1148 + 0.8604*mass_sq) / (0.04651 + mass_sq)
+
+    return r_zams | units.RSun
 
 def Hill_radius(Mstar, a, Mplanet):
     return a * (2*Mplanet/(3.0*Mstar))**(1./3.)
@@ -31,6 +44,46 @@ def rotate(position, velocity, phi, theta, psi): # theta and phi in radians
     return (numpy.dot(matrix, position.value_in(Runit)) | Runit,
            numpy.dot(matrix, velocity.value_in(Vunit)) | Vunit)
 
+def make_singletons(Nstars, Njumbos, Rvir, Fd, x=-2.0, mmin=0.3| units.MJupiter):
+    print("Make singletons.")
+    Mmin = 0.08 | units.MSun
+    Mmax = 100 | units.MSun
+    mstars = new_kroupa_mass_distribution(Nstars, mass_min=Mmin, mass_max=Mmax)
+    mjumbos = new_salpeter_mass_distribution(Njumbos,
+                                             mmin,
+                                             14|units.MJupiter, alpha=x)
+    masses = [] | units.MSun
+    masses = numpy.append(masses, mstars)
+    masses = numpy.append(masses, mjumbos)
+    random.shuffle(masses)
+
+    N = len(masses)
+    print(f"(Nstars and jumbos: {N}")
+    Mtot_init = masses.sum()
+    converter=nbody_system.nbody_to_si(Mtot_init, Rvir)
+    if Fd>0:
+        bodies = new_fractal_cluster_model(N, fractal_dimension=1.6,
+                                           convert_nbody=converter)
+    else:
+        bodies = new_plummer_model(N, convert_nbody=converter)
+    bodies.mass = masses
+    bodies.name = "star"
+    bodies.type = "star"
+    bodies.radius = ZAMS_radius(bodies.mass)
+    jumbos = bodies[bodies.mass<=20|units.MJupiter]
+    jumbos.name = "jumbos"
+    jumbos.type = "planet"
+    jumbos.radius = 1 | units.RJupiter
+    bodies.scale_to_standard(convert_nbody=converter)
+    bodies.move_to_center()
+
+    bJ = bodies[bodies.mass<14|units.MJupiter]
+    bJ06 = bJ[bJ.mass>=0.6|units.MJupiter]
+    bJ08 = bJ[bJ.mass>=0.8|units.MJupiter]
+    bJ10 = bJ[bJ.mass>=1.0|units.MJupiter]
+    print("Number of potential Jupiters=", len(bJ06), len(bJ08), len(bJ10))
+    
+    return bodies
 
 def make_outer_planetary_systems(bodies):
     print("Jumbos as Oligarchic outer circum-stellar planets.")
@@ -107,7 +160,9 @@ def make_arXiv2310_06016(bodies, a1=800|units.au, a2=1000|units.au, jumbo_mass_f
         #sma = [a1.value_in(units.au), a2.value_in(units.au)] | units.au
         #a1 = 10**numpy.random.uniform(1, 3, 1)[0] | units.au
         #a1 = numpy.random.uniform(30, 3000, 1)[0] | units.au
-        a1 = numpy.random.uniform(20, 2000, 1)[0] | units.au
+        #a1 = numpy.random.uniform(10, 1000, 1)[0] | units.au
+        a1 = numpy.random.uniform(a1.value_in(units.au),
+                                  a2.value_in(units.au), 1)[0] | units.au
         #a1 = 1000|units.au
         rH = Hill_radius(mprim[0], a1, msec[0])
         #print("Hill radius=", a1.in_(units.au), rH.in_(units.au))
@@ -168,7 +223,7 @@ def make_jumbo_as_planetmoon_pair(bodies):
                                                  20|units.MJupiter, alpha=-1.2)
         mprim = Mjumbos*q
         msec = Mjumbos*(1-q) 
-        sma = numpy.random.uniform(10, 400, 1) | units.au
+        sma = numpy.random.uniform(10, 200, 1) | units.au
         ecc = numpy.sqrt(numpy.random.uniform(0, 0.02**2, 1))
         inc = numpy.arccos(1-2*numpy.random.uniform(0,1, 1)) | units.rad
         loan = numpy.random.uniform(0, 2*numpy.pi, 1) | units.rad
@@ -217,7 +272,9 @@ def make_jumbo_as_planetmoon_pair(bodies):
         all_jumbos.add_particles(jumbo)            
     return all_jumbos
 
-def make_isolated_jumbos(bodies):
+def make_isolated_jumbos(bodies,
+                         a1=25| units.au,
+                         a2=1000| units.au):
     print("Jumbos as isolated free floating binary pair.")
 
     JuMBOs = bodies[bodies.name=="jumbos"]
@@ -227,7 +284,9 @@ def make_isolated_jumbos(bodies):
     mprim = JuMBOs.mass
     msec = JuMBOs.m2
     #sma = numpy.random.uniform(10, 100, njumbos) | units.au
-    sma = numpy.random.uniform(10, 1000, njumbos) | units.au
+    #sma = numpy.random.uniform(10, 1000, njumbos) | units.au
+    sma = numpy.random.uniform(a1.value_in(units.au),
+                               a2.value_in(units.au), njumbos) | units.au
 
     ecc = numpy.sqrt(numpy.random.uniform(0, 0.9**2, njumbos))
     inc = numpy.arccos(1-2*numpy.random.uniform(0,1, njumbos))| units.rad
