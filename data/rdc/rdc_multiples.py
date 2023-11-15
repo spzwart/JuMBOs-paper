@@ -258,5 +258,7 @@ if __name__ in ('__main__', '__plot__'):
     print(f"{o.filename} & {n_s} & {nss} & {nsp} & {n_p} & {npp} & {nspp} & {nppp} & {npppph} & {npppp} \\\\")
     print(f"${Mm:2.3f}^{{+{M75:2.3f}}}_{{-{M25:2.3f}}}$ & ${mm:2.3f}^{{+{m75:2.3f}}}_{{-{m25:2.3f}}}$ & ${am:2.3f}^{{+{a75:2.3f}}}_{{-{a25:2.3f}}}$ & ${em:2.3f}^{{+{e75:2.3f}}}_{{-{e25:2.3f}}}$& ${dd:2.3f}^{{+{d75:2.3f}}}_{{-{d25:2.3f}}}$  \\\\")
 
+    print(f"Model {o.filename},{n_s},{nss},{nsp},{n_p},{npp},{nspp},{nppp},{npppph},{npppp},{Mm:2.3f},{M75:2.3f},{mm:2.3f},{m75:2.3f},{am:2.3f},{a75:2.3f},${em:2.3f},{e75:2.3f},{dd:2.3f},{d75:2.3f}")
+    
 
     
