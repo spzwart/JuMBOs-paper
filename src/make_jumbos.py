@@ -133,7 +133,7 @@ def make_outer_planetary_systems(bodies):
         jumbos.add_particles(outer_planets)
     return jumbos
 
-def make_arXiv2310_06016(bodies, a1=800|units.au, a2=1000|units.au, jumbo_mass_function=False):
+def make_planetplanet(bodies, a1=800|units.au, a2=1000|units.au, jumbo_mass_function=False):
     print("Jumbos as outer circum-stellar planets following ArXiv 2310_06016.")
     
     host_stars = bodies[bodies.name=="host"]
@@ -148,8 +148,6 @@ def make_arXiv2310_06016(bodies, a1=800|units.au, a2=1000|units.au, jumbo_mass_f
                 Mjumbos = new_salpeter_mass_distribution(1,
                                                          0.8|units.MJupiter,
                                                          14|units.MJupiter, alpha=-1.2)[0]
-                #q = numpy.sqrt(numpy.random.uniform(0.5**2, 1, 1))        
-                #q = numpy.sqrt(numpy.random.uniform(0, 1, 1))[0]
                 q = numpy.sqrt(numpy.random.uniform(0.2**2, 1, 1)[0])
                 mprim = [si.mass.value_in(units.MSun), si.mass.value_in(units.MSun)] | units.MSun
                 msec = [q, 1-q] * Mjumbos
@@ -161,18 +159,20 @@ def make_arXiv2310_06016(bodies, a1=800|units.au, a2=1000|units.au, jumbo_mass_f
         #a1 = 10**numpy.random.uniform(1, 3, 1)[0] | units.au
         #a1 = numpy.random.uniform(30, 3000, 1)[0] | units.au
         #a1 = numpy.random.uniform(10, 1000, 1)[0] | units.au
-        a1 = numpy.random.uniform(a1.value_in(units.au),
-                                  a2.value_in(units.au), 1)[0] | units.au
+
+        ainner = numpy.random.uniform(a1.value_in(units.au),
+                                      a2.value_in(units.au), 1)[0] | units.au
         #a1 = 1000|units.au
-        rH = Hill_radius(mprim[0], a1, msec[0])
+        rH = Hill_radius(mprim[0], ainner, msec[0])
         #print("Hill radius=", a1.in_(units.au), rH.in_(units.au))
         #a2 = sma_from_Hill_radius(mprim[1], msec[1], rH)
-        a2 = a1 + 10*rH
-        #a2 = a1 + 5*rH
+        #a2 = a1 + 10*rH
+        aouter = ainner + 5*rH
         #a2 = a1 + 2*rH
-        sma = [a1.value_in(units.au), a2.value_in(units.au)] | units.au
-        #print("initial semimajor_axis=", sma.in_(units.au))
-        #print("initial planet masses=", msec.in_(units.MJupiter))
+
+        sma = [ainner.value_in(units.au), aouter.value_in(units.au)] | units.au
+        print("Initial semimajor_axis=", sma.in_(units.au))
+        print("Initial planet masses=", msec.in_(units.MJupiter))
         ecc = numpy.sqrt(numpy.random.uniform(0, 0.02**2, 2))
         inc = numpy.arccos(1-2*numpy.random.uniform(0,1, 2)) | units.rad
         inc[1] = inc[0] + numpy.radians(numpy.random.uniform(-1,1, 1)) | units.rad
@@ -205,7 +205,8 @@ def make_arXiv2310_06016(bodies, a1=800|units.au, a2=1000|units.au, jumbo_mass_f
 
     return jumbos
 
-def make_jumbo_as_planetmoon_pair(bodies): 
+def make_jumbo_as_planetmoon_pair(bodies, a1=10| units.au, a2=200|units.au,
+                                  x=-1.2): 
     print("Jumbos as outer circum-stellar planets-moon pair.")
 
     host_stars = bodies[bodies.name=="host"]
@@ -215,20 +216,20 @@ def make_jumbo_as_planetmoon_pair(bodies):
     all_jumbos = Particles()
 
     for si in host_stars:
-        #q = numpy.sqrt(numpy.random.uniform(0.5**2, 1, 1))
-        #q = numpy.random.uniform(0.5, 1, 1)
         q = numpy.sqrt(numpy.random.uniform(0.2**2, 1, 1)[0])
         Mjumbos = new_salpeter_mass_distribution(1,
                                                  1|units.MJupiter,
-                                                 20|units.MJupiter, alpha=-1.2)
+                                                 20|units.MJupiter, alpha=-1.2)[0]
         mprim = Mjumbos*q
         msec = Mjumbos*(1-q) 
-        sma = numpy.random.uniform(10, 200, 1) | units.au
+        sma = numpy.random.uniform(a1.value_in(units.au),
+                                   a2.value_in(units.au), 1)[0] | units.au
         ecc = numpy.sqrt(numpy.random.uniform(0, 0.02**2, 1))
-        inc = numpy.arccos(1-2*numpy.random.uniform(0,1, 1)) | units.rad
-        loan = numpy.random.uniform(0, 2*numpy.pi, 1) | units.rad
-        aop = numpy.random.uniform(0, 2*numpy.pi, 1)| units.rad
-        ta = numpy.random.uniform(0, 2*numpy.pi, 1)| units.rad
+        inc = numpy.arccos(1-2*numpy.random.uniform(0,1, 1))[0] | units.rad
+        loan = numpy.random.uniform(0, 2*numpy.pi, 1)[0] | units.rad
+        aop = numpy.random.uniform(0, 2*numpy.pi, 1)[0]| units.rad
+        ta = numpy.random.uniform(0, 2*numpy.pi, 1)[0]| units.rad
+        print(f"Planet-moon pair: a={sma.in_(units.au)}, e={ecc}, i={inc.in_(units.deg)}")
 
         jumbo = new_binary_from_orbital_elements(
             mprim, msec, 
@@ -248,11 +249,12 @@ def make_jumbo_as_planetmoon_pair(bodies):
 
         rH = 3*sma
         sma = sma_from_Hill_radius(si.mass, jumbo.mass.sum(), rH)
-        ecc = numpy.sqrt(numpy.random.uniform(0, 0.02**2, 1))
-        inc = numpy.arccos(1-2*numpy.random.uniform(0, 1, 1)) | units.rad
-        loan = numpy.random.uniform(0, 2*numpy.pi, 1) | units.rad
-        aop = numpy.random.uniform(0, 2*numpy.pi, 1)| units.rad
-        ta = numpy.random.uniform(0, 2*numpy.pi, 1)| units.rad
+        ecc = numpy.sqrt(numpy.random.uniform(0, 0.02**2, 1)[0])
+        inc = numpy.arccos(1-2*numpy.random.uniform(0, 1, 1)[0]) | units.rad
+        loan = numpy.random.uniform(0, 2*numpy.pi, 1)[0] | units.rad
+        aop = numpy.random.uniform(0, 2*numpy.pi, 1)[0]| units.rad
+        ta = numpy.random.uniform(0, 2*numpy.pi, 1)[0]| units.rad
+        print(f"Star-pm orbit: a={sma.in_(units.au)}, e={ecc}, i={inc.in_(units.deg)}")
         
         binary = new_binary_from_orbital_elements(
             mprim, msec, 
@@ -364,7 +366,7 @@ if __name__ in ('__main__', '__plot__'):
         if o.arxive==0:        
             jumbos = make_outer_planetary_systems(stars)
         else:
-            jumbos = make_arXiv2310_06016(stars)
+            jumbos = make_planetplanet(stars)
     
     stars.add_particles(jumbos)
     write_set_to_file(stars, o.outfile, "amuse", close_file=True)

@@ -11,7 +11,7 @@ from amuse.community.fractalcluster.interface import new_fractal_cluster_model
 from matplotlib import pyplot as plt
 from make_jumbos import make_outer_planetary_systems
 from make_jumbos import make_isolated_jumbos
-from make_jumbos import make_arXiv2310_06016
+from make_jumbos import make_planetplanet
 from make_jumbos import make_jumbo_as_planetmoon_pair
 from make_jumbos import make_singletons
 
@@ -102,7 +102,7 @@ def make_initial_cluster(Nstars, Njumbos, Rvir, Fd, jumbo_model,
 
     N = Nstars
     if jumbo_model=="freefloaters":
-        N = Nstars + int(Njumbos/2)
+        N = Nstars + int(Njumbos)
 
     Mmin = 0.08 | units.MSun
     Mmax = 100 | units.MSun
@@ -122,7 +122,7 @@ def make_initial_cluster(Nstars, Njumbos, Rvir, Fd, jumbo_model,
         JuMBOs = bodies.random_sample(Njumbos)
         JuMBOs.mass = new_salpeter_mass_distribution(Njumbos,
                                                      0.8|units.MJupiter,
-                                                     14|units.MJupiter, alpha=-1.2)
+                                                     14|units.MJupiter, alpha=x)
         q = numpy.sqrt(numpy.random.uniform(0.2**2, 1, Njumbos))
         JuMBOs.name = "jumbos"
         JuMBOs.type = "planet"
@@ -148,9 +148,9 @@ def make_initial_cluster(Nstars, Njumbos, Rvir, Fd, jumbo_model,
         nhost_stars = len(host_stars)
         print(f"Mass limit for jumbos: {host_stars.mass.min().in_(units.MSun)}, {host_stars.mass.max().in_(units.MSun)}")
         if jumbo_model=="circum_stellar":
-            jumbos = make_arXiv2310_06016(bodies, a1, a2, jumbo_mass_function)
+            jumbos = make_planetplanet(bodies, a1, a2, jumbo_mass_function)
         elif jumbo_model=="planetmoon":
-            jumbos = make_jumbo_as_planetmoon_pair(bodies)
+            jumbos = make_jumbo_as_planetmoon_pair(bodies, a1, a2, x)
         elif jumbo_model=="oligarchic":
             jumbos = make_outer_planetary_systems(bodies)
         else:
@@ -178,7 +178,7 @@ def  run_cluster(bodies, Rvir, t_end, dt):
     """
 
     converter=nbody_system.nbody_to_si(bodies.mass.sum(), Rvir)
-    gravity = ph4(converter, number_of_workers=5)
+    gravity = ph4(converter, number_of_workers=1)
     #gravity = Petar(converter)#, mode="gpu")#, number_of_workers=6)
     #gravity = Petar(converter, mode="gpu")#, number_of_workers=6)
     #print(gravity.parameters)
@@ -279,7 +279,7 @@ def new_option_parser():
     result.add_option("--model", dest="jumbo_model", default = "classic",
                       help="select jumbo model (freefloaters, circum_stellar, planetmoon, oligarchic, singletons) [%default]")
     result.add_option("-q", action='store_true',
-                      dest="jumbo_mass_function", default="False",
+                      dest="jumbo_mass_function", default="True",
                       help="jumbo mass function [%default]")
     return result
 
