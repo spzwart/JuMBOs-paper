@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
+from scipy.stats import iqr
 from amuse.units import units
 from amuse.units import nbody_system
 from amuse.ic.plummer import new_plummer_model
@@ -18,6 +19,12 @@ from amuse.lab import write_set_to_file, read_set_from_file
 
 from amuse.ext.orbital_elements import get_orbital_elements_from_arrays
 from amuse.ext.orbital_elements import orbital_elements_from_binary
+
+def rounded_means_quartiles(data):
+    M25 =iqr(data, rng=(25, 50))
+    M75 =iqr(data, rng=(50, 75))
+    Mm  = np.median(data)
+    return Mm, M25, M75
 
 def is_this_binary_planet_orbiting_a_star(stars, planet):
 
@@ -98,67 +105,93 @@ def construct_center_of_mass_particle(body):
     cm.velocity = p.center_of_mass_velocity()
     return cm
 
-def find_companions(stars, planets):
+def find_multiple_complex_systems(stars):
 
-    binaries = Particles()
-    components = Particles()
+    mplanet = 50 | units.MJupiter
+    stars_done = Particles()
+    
+    N = {}
+    mprim = {}
+    msec = {}
+    sma = {}
+    ecc = {}
+    planets = stars.copy()
     for bi in range(len(stars)):
         if stars[bi] in planets:
-            plts = planets - stars[bi]
-        else:
-            plts = planets
-        total_masses = plts.mass + stars[bi].mass
-        rel_pos = plts.position-stars[bi].position
-        rel_vel = plts.velocity-stars[bi].velocity
-        sma, ecc, true_anomaly,\
+            planets.remove_particle(stars[bi])
+        if len(planets)<=1:
+            print("All combinations of stars done.")
+            break
+        if stars[bi] in stars_done:
+            continue
+        #stars_done.add_particle(stars[bi])
+        total_masses = planets.mass + stars[bi].mass
+        rel_pos = planets.position-stars[bi].position
+        rel_vel = planets.velocity-stars[bi].velocity
+        smai, ecci, true_anomaly,\
             inc, long_asc_node, arg_per_mat =\
                 get_orbital_elements_from_arrays(rel_pos,
                                                  rel_vel,
                                                  total_masses,
                                                  G=constants.G)
-        e = np.ma.masked_where(ecc>1, ecc)
+        e = np.ma.masked_where(ecci>1, ecci)
         e = np.ma.masked_invalid(e)
         if(len(np.ma.compressed(e))>0):
-            k = np.ma.masked_array(plts.key, e.mask)
+            k = np.ma.masked_array(planets.key, e.mask)
             k = np.ma.compressed(k)
             p = Particles()
-            for pi in plts:
+            for pi in planets:
                 if pi.key in k:
                     p.add_particle(pi)
-            #p = planets[planets.key==k] # does not seem to work properly?
-            a = np.ma.masked_array(sma, e.mask)
+            a = np.ma.masked_array(smai, e.mask)
             a = np.ma.compressed(a)
             i = np.ma.masked_array(inc, e.mask)
             i = np.ma.compressed(i)
             e = np.ma.compressed(e)
             #sort on semi-major axis
             a, e, i, p = (list(t) for t in zip(*sorted(zip(a, e, i, p))))
-            
-            #print("companion found:", e, len(p))
-            if len(p)>=1:
-                if a[0]<1000|units.au:
-                    b = Particle()
-                    ai = a[0]
-                    ii = i[0]
-                    ei = e[0]
-                    b = construct_center_of_mass_from_particle_pair(stars[bi], p[0])
-                    dproj = stars[bi].position-p[0].position
-                    b.semimajor_axis = ai
-                    b.eccentricity = ei
-                    b.inclination = ii
-                    b.dx = dproj[0]
-                    b.dy = dproj[1]
-                    b.dz = dproj[2]
-                    if p[0].key in components.key:
-                        #print("already done")
-                        pass
+            if stars[bi].mass>mplanet:
+                name = "s"
+            else:
+                name = "p"
+            for pi in range(len(p)):
+                planets.remove_particle(p[pi])
+                #stars_done.add_particle(p[pi])
+                if a[pi]<1000|units.au:
+                    #planets.remove_particle(p[pi])
+                    print("N=", len(planets))
+                    if p[pi].mass>mplanet:
+                        name += "s"
                     else:
-                        #print(f"a={ai.in_(units.au)}, e={ei}: {stars[bi].name} ({stars[bi].mass.in_(units.MSun)}), {p[0].name} ({p[0].mass.in_(units.MSun)})")
-                        components.add_particle(stars[bi])
-                        components.add_particle(p[0])
-                        binaries.add_particle(b)
-    return binaries, components
-
+                        name += "p"
+            name = "".join(sorted(name, reverse=True))
+            
+            if a[0]>25|units.au and a[0]<1000|units.au:
+            #if a[0]<1000|units.au:
+                if name in N:
+                    N[name] += 1
+                    sma[name].append(a[0])
+                    ecc[name].append(e[0])
+                    mprim[name].append(max(stars[bi].mass, p[0].mass))
+                    msec[name].append(min(stars[bi].mass, p[0].mass))
+                else:
+                    N[name] = 1
+                    sma[name] = [a[0].value_in(units.au)] | units.au
+                    ecc[name] = [e[0]]
+                    mprim[name] = [max(stars[bi].mass.value_in(units.MJupiter), p[0].mass.value_in(units.MJupiter))] | units.MJupiter
+                    msec[name] = [min(stars[bi].mass.value_in(units.MJupiter), p[0].mass.value_in(units.MJupiter))] | units.MJupiter
+            else:
+                if "s" in N:
+                    N["s"] += name.count("s")
+                else:
+                    N["s"] = name.count("s")
+                if "p" in N:
+                    N["p"] += name.count("p")
+                else:
+                    N["p"] = name.count("p")
+                
+    return N, sma, ecc, mprim, msec
+                    
 def print_multiple_data(binaries, typename):
     #print("type,key,k1,k2,M,m,a,e,i,dx,dy,dz,x,y,z,vx,vy,vz")
     for bi in binaries:
@@ -178,8 +211,6 @@ def new_option_parser():
 if __name__=="__main__":
     o, arguments  = new_option_parser().parse_args()
 
-    outfile = "processed_"+o.filename
-    
     # read in all partilces
     bodies = read_set_from_file(o.filename, close_file=True)
     bodies.dx = 0 | units.au
@@ -189,47 +220,77 @@ if __name__=="__main__":
     bodies.eccentricity = 0 
     bodies.inclination = 0 | units.deg
     bodies.q = 1
-    #for bi in bodies:
-    #    bi.companions = Particles()
-    #    bi.parent = Particles()
+    mplanet = 50 | units.MJupiter
+    bodies = bodies[bodies.mass>0.6|units.MJupiter]
 
     stars = bodies.copy()
     stars.ncomponents = 1
     stars.id1 = 0
     stars.id2 = 0
 
-    binaries, components = find_companions(stars, stars)
-    #print(f"N binaries: {len(binaries)}")
-    stars.remove_particles(components)
-    stars.add_particles(binaries)
-    print_multiple_data(binaries, "binary")
-    
-    triples, triple_components = find_companions(binaries, stars)
-    #print(f"N triples: {len(triples)}")
-    stars.remove_particles(triple_components)
-    stars.add_particles(triples)
-    print_multiple_data(triples, "triple")
-    
-    binary_binary, quadruple_components = find_companions(binaries, binaries)
-    #print(f"N binary-binary: {len(binary_binary)}")
-    for bi in triple_components:
-        if bi.key in quadruple_components:
-            print(f"star in triple as well as in quadruple: bi")
-    #stars.remove_particles(components)
-    print_multiple_data(binary_binary, "binbin")
-            
-    triple_single, components = find_companions(triples, stars)
-    #print(f"N triples-single: {len(triple_single)}")
-    for ci in components:
-        if ci in stars:
-            stars.remove_particle(ci)
-    print_multiple_data(triple_single, "tripsing")
+    N, sma, ecc, mp, ms = find_multiple_complex_systems(stars)
 
-    for bi in binaries:
-        if bi in stars:
-            stars.remove_particle(bi)
-    for ti in triples:
-        if ti in stars:
-            stars.remove_particle(ti)
-    print_multiple_data(stars, "singleton")
+    planets = stars[stars.mass<mplanet]
+    jupiters = planets[planets.mass>0.6|units.MJupiter]
+    stars = stars - planets
+    Njup = len(jupiters)
+    Nstr = len(stars)
+        
+    print(f"N={N}")
     
+    for key, value in mp.items():
+        print(f"{np.mean(value)} &", end=" ")
+    for key, value in ms.items():
+        print(f"{np.mean(value)} &", end=" ")
+    for key, value in sma.items():
+        print(f"{np.mean(value).value_in(units.au)} &", end=" ")
+    for key, value in ecc.items():
+        print(f"{np.mean(value)} &", end=" ")
+
+    print(f"N={N}")
+    for key in ["s", "ss", "sp", "p", "pp", 'spp']:
+        if key not in N:
+            N[key] = 0
+        
+    Np = Njup-N['sp']-2*N['pp']-2*N['spp']
+    Ns = Nstr-N['sp']-2*N['ss']-N['spp']
+    print(f"Ns={Ns}, Np={Np}")
+    #print(f"{o.filename} & ", end=" ")
+    n = 0
+    for key, value in N.items():
+        n += N[key] 
+    for key in ["s", "ss", "sp", "p", "pp"]:
+        n -= N[key] 
+        print(N[key], "&", end="")
+    print("\\\\")
+
+    print(o.filename,"&", Ns, "&",  N['ss'], "&",  N['sp'], "&",  N['spp'], "&",  Np, "&",  N['pp'], "\\\\")
+
+    key = 'pp'
+    print(f"Orbital elements for {key} systems:")
+    if N['pp']>0:
+        print(f"{o.filename} & ", end=" ")
+        M, dM25, dM75 = rounded_means_quartiles(mp[key].value_in(units.MJupiter))
+        print(f"${M:2.2f}^{{+{dM25:2.2f}}}_{{-{dM75:2.2f}}}$ &", end=" ")
+        M, dM25, dM75 = rounded_means_quartiles(ms[key].value_in(units.MJupiter))
+        print(f"${M:2.2f}^{{+{dM25:2.2f}}}_{{-{dM75:2.2f}}}$ &", end=" ")
+        a, da25, da75 = rounded_means_quartiles(sma[key].value_in(units.au))
+        print(f"${a:2.2f}^{{+{da25:2.2f}}}_{{-{da75:2.2f}}}$ &", end=" ")
+        e, de25, de75 = rounded_means_quartiles(ecc[key])
+        print(f"${e:2.2f}^{{+{de25:2.2f}}}_{{-{de75:2.2f}}}$ \\\\")
+
+
+    key = 'ss'
+    print(f"Orbital elements for {key} systems:")
+    if N['pp']>0:
+        print(f"{o.filename} & ", end=" ")
+        M, dM25, dM75 = rounded_means_quartiles(mp[key].value_in(units.MJupiter))
+        print(f"${M:2.2f}^{{+{dM25:2.2f}}}_{{-{dM75:2.2f}}}$ &", end=" ")
+        M, dM25, dM75 = rounded_means_quartiles(ms[key].value_in(units.MJupiter))
+        print(f"${M:2.2f}^{{+{dM25:2.2f}}}_{{-{dM75:2.2f}}}$ &", end=" ")
+        a, da25, da75 = rounded_means_quartiles(sma[key].value_in(units.au))
+        print(f"${a:2.2f}^{{+{da25:2.2f}}}_{{-{da75:2.2f}}}$ &", end=" ")
+        e, de25, de75 = rounded_means_quartiles(ecc[key])
+        print(f"${e:2.2f}^{{+{de25:2.2f}}}_{{-{de75:2.2f}}}$ \\\\")
+
+        

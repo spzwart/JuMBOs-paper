@@ -175,7 +175,7 @@ def make_planetplanet(bodies, a1=800|units.au, a2=1000|units.au, jumbo_mass_func
         print("Initial planet masses=", msec.in_(units.MJupiter))
         ecc = numpy.sqrt(numpy.random.uniform(0, 0.02**2, 2))
         inc = numpy.arccos(1-2*numpy.random.uniform(0,1, 2)) | units.rad
-        inc[1] = inc[0] + numpy.radians(numpy.random.uniform(-1,1, 1)) | units.rad
+        inc[1] = inc[0] + numpy.radians(numpy.random.uniform(-1,1, 1)) | units.deg
         loan = numpy.random.uniform(0, 2*numpy.pi, 2) | units.rad
         loan[1] = loan[0] + numpy.radians(numpy.random.uniform(-1, 1, 1)) | units.rad
         aop = numpy.random.uniform(0, 2*numpy.pi, 2)| units.rad

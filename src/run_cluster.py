@@ -178,7 +178,7 @@ def  run_cluster(bodies, Rvir, t_end, dt):
     """
 
     converter=nbody_system.nbody_to_si(bodies.mass.sum(), Rvir)
-    gravity = ph4(converter, number_of_workers=1)
+    gravity = ph4(converter, number_of_workers=3)
     #gravity = Petar(converter)#, mode="gpu")#, number_of_workers=6)
     #gravity = Petar(converter, mode="gpu")#, number_of_workers=6)
     #print(gravity.parameters)
