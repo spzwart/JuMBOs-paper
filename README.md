@@ -1,8 +1,6 @@
 # JuMBOs
-########
 
-# this file:
- . README.md 
+# README.md       # this file:
 
 # directory structure:
  - tex            # latex files
