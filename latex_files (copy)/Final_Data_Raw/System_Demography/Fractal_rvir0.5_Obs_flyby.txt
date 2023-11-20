@@ -1,0 +1,17 @@
+Raw Isol J Neigh. [ 160.  274.  346.  307.  259.  277.  155.   91.  153.  330.]
+Med. Isol J Neigh. 266.5
+Q1: 110.25 Q3: 33.0
+Raw JJ Neigh. [ 0.  4.  2.  4.  0.  1.  0.  0.  0.  3.]
+Med. JJ Neigh. 0.5
+Q1: 0.5 Q3: 2.25
+Raw JS Neigh. [ 26.  46.  78.  63.  53.  65.  21.  13.  21.  62.]
+Med. JS Neigh. 49.5
+Q1: 27.25 Q3: 13.25
+Raw SS Neigh. [ 2.  5.  3.  5.  1.  9.  0.  1.  1.  3.]
+Med. SS Neigh. 2.5
+Q1: 1.5 Q3: 2.0
+[['JuMBOs', 'JuMBOs', 'JuMBOs'], 1]
+[['JuMBOs', 'JuMBOs', 'star'], 1]
+[['JuMBOs', 'star', 'star', 'star'], 1]
+[['JuMBOs', 'star', 'star', 'star', 'star'], 2]
+[['star', 'star', 'star'], 11]

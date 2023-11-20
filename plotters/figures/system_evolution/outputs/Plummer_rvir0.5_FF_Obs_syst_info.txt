@@ -1,0 +1,40 @@
+Raw data JuMBO Systs: [ 44.  49.  48.  43.  49.  51.  48.  56.  43.  50.  55.  44.  47.  51.  42.
+  50.  44.  49.  45.  49.]
+Median: 48.5
+IQR Low: 4.5, IQR High: 1.5
+Med. Survival Rate: 0.6928571428571428
+
+Raw data New JuMBOs: [ 1.  2.  0.  1.  0.  1.  0.  0.  1.  0.  1.  0.  0.  0.  1.  2.  0.  1.
+  1.  0.]
+Median: 0.5
+IQR Low: 0.5, IQR High: 0.5
+
+Raw data SS Systs: [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  1.  0.  0.  0.  0.
+  0.  0.]
+Median: 0.0
+IQR Low: 0.0, IQR High: 0.0
+
+Raw data JS Systs: [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.  0.
+  1.  0.]
+Median: 0.0
+IQR Low: 0.0, IQR High: 0.0
+
+Raw data JS Semi-major: [820.37514101245335, 609.48435937064278]
+Median: 714.929750191548
+IQR Low: 52.722695410452616, IQR High: 52.72269541045273
+
+Raw data JS Eccentricity: [0.1834559488595939, 0.62715888750003335]
+Median: 0.40530741817981364
+IQR Low: 0.11092573466010991, IQR High: 0.11092573466010991
+
+Raw data JS masses: [3.8608281559605961, 26.885421949276939]
+Median: 15.373125052618768
+IQR Low: 5.7561484483290855, IQR High: 5.7561484483290855
+
+Raw data N>2 Populations: []
+Median: None
+IQR Low: None, IQR High: None
+
+
+===============================
+System Type & Avg. Detections:

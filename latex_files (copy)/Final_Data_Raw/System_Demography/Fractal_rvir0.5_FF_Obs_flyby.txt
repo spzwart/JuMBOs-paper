@@ -1,0 +1,14 @@
+Raw Isol J Neigh. [ 270.  277.  261.  207.  309.  190.  395.  272.  339.  273.]
+Med. Isol J Neigh. 272.5
+Q1: 9.25 Q3: 28.5
+Raw JJ Neigh. [ 5.  4.  5.  3.  1.  4.  7.  3.  2.  0.]
+Med. JJ Neigh. 3.5
+Q1: 1.25 Q3: 1.25
+Raw JS Neigh. [ 57.  57.  58.  35.  50.  42.  70.  60.  64.  41.]
+Med. JS Neigh. 57.0
+Q1: 13.0 Q3: 2.5
+Raw SS Neigh. [ 4.  4.  4.  1.  4.  2.  3.  5.  3.  4.]
+Med. SS Neigh. 4.0
+Q1: 1.0 Q3: 0.0
+[['star', 'star', 'star'], 21]
+[['star', 'star', 'star', 'star'], 1]

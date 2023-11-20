@@ -1,0 +1,12 @@
+Raw Isol J Neigh. [ 377.    7.    3.    0.    0.]
+Med. Isol J Neigh. 3.0
+Q1: 3.0 Q3: 4.0
+Raw JJ Neigh. [ 6.  0.  1.  0.  0.]
+Med. JJ Neigh. 0.0
+Q1: 0.0 Q3: 1.0
+Raw JS Neigh. [ 38.   0.   0.   0.   0.]
+Med. JS Neigh. 0.0
+Q1: 0.0 Q3: 0.0
+Raw SS Neigh. [ 5.  0.  0.  0.  0.]
+Med. SS Neigh. 0.0
+Q1: 0.0 Q3: 0.0

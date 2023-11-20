@@ -1,0 +1,9 @@
+*.png
+*.h5
+*.amuse*
+data/Simulation_Data/*
+*.pyc
+*.mp4
+data/*
+plotters/figures/system_evolution/output_movie/*
+*.pdf

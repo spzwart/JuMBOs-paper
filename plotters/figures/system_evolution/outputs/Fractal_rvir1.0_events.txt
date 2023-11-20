@@ -1,0 +1,41 @@
+Raw JJ Merge Data: [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.
+  0.  0.]
+Median: 0.0
+IQR Low: 0.0, IQR High: 0.0
+
+Raw JS Merge Data: [ 2.  3.  1.  2.  0.  1.  0.  1.  0.  4.  0.  3.  1.  1.  1.  1.  1.  1.
+  2.  2.]
+Median: 1.0
+IQR Low: 0.0, IQR High: 1.0
+
+Raw SS Merge Data: [  8.  14.   4.  18.  11.  20.   9.  23.   8.  18.  13.  14.  14.   6.  20.
+   4.   9.  14.  16.  15.]
+Median: 14.0
+IQR Low: 5.25, IQR High: 2.5
+
+Raw JMO Ejec Data: [ 0.  0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.  0.  0.  1.  0.
+  0.  1.]
+Median: 0.0
+IQR Low: 0.0, IQR High: 0.0
+
+
+Raw Star Ejec Data: [ 0.  0.  0.  1.  0.  0.  0.  1.  0.  0.  1.  0.  0.  0.  1.  0.  0.  2.
+  1.  3.]
+Median: 0.0
+IQR Low: 0.0, IQR High: 1.0
+
+Raw JuMBO Ejec Data: [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.
+  0.  0.]
+Median: 0.0
+IQR Low: 0.0, IQR High: 0.0
+
+Raw JS Ejec Data: [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.
+  0.  0.]
+Median: 0.0
+IQR Low: 0.0, IQR High: 0.0
+
+Raw SS Ejec Data: [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.
+  0.  0.]
+Median: 0.0
+IQR Low: 0.0, IQR High: 0.0
+

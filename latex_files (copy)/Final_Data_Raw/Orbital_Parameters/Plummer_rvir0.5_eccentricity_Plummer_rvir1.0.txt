@@ -1,0 +1,11 @@
+Orbital parameter: eccentricity
+Model Plummer_rvir0.5 vs Plummer_rvir1.0
+KS value: KstestResult(statistic=0.02030973962346368, pvalue=0.27663474763273954)
+
+Median Plummer_rvir0.5: 0.684302770164
+IQR Plummer_rvir0.5: 0.215493833716, 0.162722433063
+
+Median Plummer_rvir1.0: 0.678261450275
+IQR Plummer_rvir1.0: 0.200191891983, 0.161896647349
+
+
