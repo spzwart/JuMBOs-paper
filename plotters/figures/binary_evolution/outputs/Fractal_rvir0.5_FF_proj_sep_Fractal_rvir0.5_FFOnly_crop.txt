@@ -1,0 +1,15 @@
+Orbital parameter: proj_sep
+Model Fractal_rvir0.5_FF vs Fractal_rvir0.5_FFOnly
+KS value: KstestResult(statistic=0.5161350844277673, pvalue=8.2754892023792216e-47)
+
+Median Fractal_rvir0.5_FF: 87.5932904296
+IQR Fractal_rvir0.5_FF: 59.3719732139, 127.273403838
+
+Median Fractal_rvir0.5_FFOnly: 352.997779137
+IQR Fractal_rvir0.5_FFOnly: 126.955012461, 113.51817907
+
+
+Fractal_rvir0.5_FF: Fraction > 25au Sep: 0.753320683112
+IQR 0.0295680843594, 0.0656728233816
+Fractal_rvir0.5_FFOnlyFraction > 25au Sep: 1.0
+IQR 0.0163043478261, 0.0

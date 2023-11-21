@@ -1,0 +1,11 @@
+Orbital parameter: sem_axis
+Model Fractal_rvir0.5 vs Fractal_rvir0.5_FF_10Myr
+KS value: KstestResult(statistic=0.18742251947535163, pvalue=1.4270989945330825e-09)
+
+Median Fractal_rvir0.5: 146.563354893
+IQR Fractal_rvir0.5: 101.541137116, 224.580368056
+
+Median Fractal_rvir0.5_FF_10Myr: 257.568902172
+IQR Fractal_rvir0.5_FF_10Myr: 152.915894679, 247.765267132
+
+

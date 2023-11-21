@@ -1,0 +1,11 @@
+Orbital parameter: eccentricity
+Model Fractal_rvir0.5_FF vs Fractal_rvir0.5_FFOnly
+KS value: KstestResult(statistic=0.3696060037523452, pvalue=2.0013356777983949e-23)
+
+Median Fractal_rvir0.5_FF: 0.630482456783
+IQR Fractal_rvir0.5_FF: 0.182869307194, 0.189451474561
+
+Median Fractal_rvir0.5_FFOnly: 0.860223923524
+IQR Fractal_rvir0.5_FFOnly: 0.163531019867, 0.0817998514118
+
+

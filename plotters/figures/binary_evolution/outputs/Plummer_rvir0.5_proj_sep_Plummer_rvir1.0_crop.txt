@@ -1,0 +1,15 @@
+Orbital parameter: proj_sep
+Model Plummer_rvir0.5 vs Plummer_rvir1.0
+KS value: KstestResult(statistic=0.0154, pvalue=0.18651559326337599)
+
+Median Plummer_rvir0.5: 189.638939792
+IQR Plummer_rvir0.5: 112.756777463, 217.211009662
+
+Median Plummer_rvir1.0: 187.671761441
+IQR Plummer_rvir1.0: 115.858607642, 208.151919919
+
+
+Plummer_rvir0.5: Fraction > 25au Sep: 0.91
+IQR 0.0065, 0.0065
+Plummer_rvir1.0Fraction > 25au Sep: 0.911
+IQR 0.0115, 0.0075

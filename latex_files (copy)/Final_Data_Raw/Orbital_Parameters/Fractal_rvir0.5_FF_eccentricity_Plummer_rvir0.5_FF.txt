@@ -1,8 +1,0 @@
-Orbital parameter: eccentricity
-Model Fractal_rvir0.5_FF vs Plummer_rvir0.5_FF
-KS value: KstestResult(statistic=0.06470407584534722, pvalue=0.15801160571298634)
-Median Fractal_rvir0.5_FF: 0.615010193275
-IQR Fractal_rvir0.5_FF: 0.206236378737, 0.143826523475
-
-Median Plummer_rvir0.5_FF: 0.611968806641
-IQR Plummer_rvir0.5_FF: 0.175350090854, 0.143898395499

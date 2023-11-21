@@ -1,8 +1,0 @@
-Orbital parameter: sem_axis
-Model Fractal_rvir0.5_FF vs Plummer_rvir0.5_FF
-KS value: KstestResult(statistic=0.5107462435204287, pvalue=1.6653345369377348e-15)
-Median Fractal_rvir0.5_FF: 36.8408811033
-IQR Fractal_rvir0.5_FF: 20.3476153268, 41.3327986682
-
-Median Plummer_rvir0.5_FF: 187.049021601
-IQR Plummer_rvir0.5_FF: 105.64682954, 175.507191289
