@@ -6,7 +6,7 @@ class PlotterSetup(object):
     def __init__(self):
         plt.rcParams["font.family"] = "Times New Roman"
         plt.rcParams["mathtext.fontset"] = "cm"
-        self.axlabel_size = 16
+        self.axlabel_size = 14
         self.tick_size = 14
         
         left = .45

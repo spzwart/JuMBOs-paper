@@ -6,8 +6,8 @@ import natsort
 import numpy as np
 import os
 import pandas as pd
-import statsmodels.api as sm
 import warnings
+from matplotlib.ticker import FormatStrFormatter
 from scipy import stats
 
 from amuse.datamodel import Particles
@@ -28,24 +28,13 @@ class FinalInitialProperties(object):
         self.plot_func = PlotterFunctions()
         self.JuMBO_max_mass = 0.013 | units.MSun
         self.Star_min_mass = 0.08 | units.MSun
+        self.mratio = (1 | units.MSun)/(1 | units.MJupiter)
 
         self.models =  ["Fractal_rvir0.5", "Fractal_rvir0.5_FF", "Fractal_rvir1.0",
                         "Plummer_rvir0.5", "Plummer_rvir0.5_FF", "Plummer_rvir1.0",
                         "Fractal_rvir0.5_FF_10Myr", "Fractal_rvir0.5_FFOnly",
                         "Fractal_rvir0.5_Obs", "Fractal_rvir0.5_Obs_Circ",
-                        "Fractal_rvir0.5_FF_Obs", "Plummer_rvir0.5_FF_Obs"]
-                      
-        self.leg_label = [r"Fractal, $R_{\mathrm{vir}} = 0.5$ pc", 
-                          r"Fractal, $R_{\mathrm{vir}} = 0.5$ pc with FF", 
-                          r"Fractal, $R_{\mathrm{vir}} = 1.0$ pc", 
-                          r"Plummer, $R_{\mathrm{vir}} = 0.5$ pc", 
-                          r"Plummer, $R_{\mathrm{vir}} = 0.5$ pc with FF", 
-                          r"Plummer, $R_{\mathrm{vir}} = 1.0$ pc",
-                          r"Fractal, $R_{\mathrm{vir}} = 0.5$ pc with FF",
-                          r"Fractal, $R_{\mathrm{vir}} = 0.5$ pc",
-                          r"Fractal, $R_{\mathrm{vir}} = 0.5$ pc",
-                          r"Fractal, $R_{\mathrm{vir}} = 0.5$ pc with FF",
-                          r"Plummer, $R_{\mathrm{vir}} = 0.5$ pc with FF", ]
+                        "Fractal_rvir0.5_FF_Obs", "Plummer_rvir0.5_FF_Obs"]       
         self.linestyles = ["-.", ":", ":"]
         self.colours = ["red", "blue", "dodgerblue", "pink"]
         
@@ -119,28 +108,35 @@ class FinalInitialProperties(object):
     def process_final_data(self, dt_choice):
         data = ReadData()
         if (dt_choice):
-            self.models =  ["Fractal_rvir0.5", "Fractal_rvir0.5_FF", "Fractal_rvir1.0",
-                        "Plummer_rvir0.5", "Plummer_rvir0.5_FF", "Plummer_rvir1.0",
-                        "Fractal_rvir0.5_FF_10Myr", "Fractal_rvir0.5_FFOnly",
-                        "Fractal_rvir0.5_Obs", "Fractal_rvir0.5_Obs_Circ",
-                        "Fractal_rvir0.5_FF_Obs"]
+            self.models = ["Fractal_rvir0.5", "Fractal_rvir0.5_FF", "Fractal_rvir1.0",
+                           "Plummer_rvir0.5", "Plummer_rvir0.5_FF", "Plummer_rvir1.0",
+                           "Fractal_rvir0.5_FF_10Myr", "Fractal_rvir0.5_FFOnly",
+                           "Fractal_rvir0.5_Obs", "Fractal_rvir0.5_Obs_Circ",
+                           "Fractal_rvir0.5_FF_Obs"]
         
         for model_ in ["Fractal_rvir0.5"]:#self.models:
             print("Processing data for ", model_)
             data.process_final_snapshot(model_, dt_choice)
 
+    def bin_mass_property(self, mass1, mass2):
+        """Function to find mass property of binary"""
+
+        max_mass = max(mass1, mass2)
+        min_mass = min(mass1, mass2)
+        q = min_mass/max_mass
+        return max_mass, min_mass, q
+
     def event_statistics(self, dt_crop):    
         """Extract statistics on mergers + ejections"""
 
         for model_ in self.models:
+            path = "data/Simulation_Data/"+str(model_)
+            traj_files = natsort.natsorted(glob.glob(os.path.join(str(path+"/simulation_snapshot/")+"*")))
             if (dt_crop):
                 tname = model_+'_events_crop.txt'
             else:
                 tname = model_+'_events.txt'
                 
-            path = "data/Simulation_Data/"+str(model_)
-            traj_files = natsort.natsorted(glob.glob(os.path.join(str(path+"/simulation_snapshot/")+"*")))
-
             ejec_jmo = np.zeros(len(traj_files))
             ejec_star = np.zeros(len(traj_files))
             ejec_jj = np.zeros(len(traj_files))
@@ -151,7 +147,7 @@ class FinalInitialProperties(object):
             merge_ss = np.zeros(len(traj_files))
 
             fiter = 0
-            if model_ == "Fractal_rvir0.5_FF_10Myr": #No event_files saved
+            if model_ == "Fractal_rvir0.5_FF_10Myr": #No event_tracker files
                 for config_ in traj_files:
                     sim_snapshot = natsort.natsorted(glob.glob(os.path.join(config_+"/*")))
                     
@@ -172,13 +168,14 @@ class FinalInitialProperties(object):
                                     ejec_jmo[fiter] += 1
                                 else:
                                     ejec_star[fiter] += 1
+
                             elif len(ghost_parti) == 2:
                                 if dN == 2:
                                     kepler_elements = orbital_elements_from_binary(ghost_parti, G=constants.G)
                                     semimajor = kepler_elements[2]
                                     eccentric = kepler_elements[3]
                                     if semimajor < 1000 | units.au and eccentric < 1:
-                                        if max(ghost_parti.mass) < self.Star_min_mass: #Account for runaway JMO mergers
+                                        if max(ghost_parti.mass) < self.Star_min_mass:
                                             ejec_jj[fiter] += 1
                                         elif min(ghost_parti.mass) >= self.Star_min_mass:
                                             ejec_ss[fiter] += 1
@@ -192,13 +189,14 @@ class FinalInitialProperties(object):
                                         merge_ss[fiter] += 1
                                     else:
                                         merge_js[fiter] += 1
+
                             else:
                                 emerge_parti = Particles()
                                 for key_ in parti_set.key:
-                                    if len(prev_set[prev_set.key == key_]) == 0:  #Clump all mergers
+                                    if len(prev_set[prev_set.key == key_]) == 0:
                                         emerge_parti.add_particle(parti_set[parti_set.key == key_])
                                 
-                                bin_combo = list(itertools.combinations(ghost_parti, 2)) #All possible binaries in system
+                                bin_combo = list(itertools.combinations(ghost_parti, 2))
                                 det_keys_g = [ ]
                                 det_keys_e = [ ]
                                 for bin_ in bin_combo:
@@ -284,7 +282,6 @@ class FinalInitialProperties(object):
                                                     kepler_elements = orbital_elements_from_binary(bin_sys, G=constants.G)
                                                     semimajor = kepler_elements[2]
                                                     eccentric = kepler_elements[3]
-
                                                     if semimajor < 1000 | units.au and eccentric < 1:
                                                         if max(bin.mass) < self.Star_min_mass:
                                                             ejec_jj[fiter] += 1
@@ -301,14 +298,14 @@ class FinalInitialProperties(object):
                                                         ejec_jmo[fiter] += 1
                                                     elif c.mass >= self.Star_min_mass:
                                                         ejec_star[fiter] += 1
-                        prev_set = read_set_from_file(dt, "hdf5")
+                        prev_set = parti_set
                     fiter += 1
 
             else:
                 event_files = natsort.natsorted(glob.glob(os.path.join(str(path+"/event_data/")+"*")))
                 for config_ in traj_files:
-                    events = pd.read_hdf(event_files[fiter], 'dfEvent')
                     print("Processing statistics for ", config_)
+                    events = pd.read_hdf(event_files[fiter], 'dfEvent')
                     tracked_key = np.asarray([ ])
                     for col_ in range(np.shape(events)[1]):
                         event_key = events.iloc[1][col_]
@@ -338,44 +335,6 @@ class FinalInitialProperties(object):
                             tracked_key = np.asarray(np.concatenate((tracked_key, 
                                                                      event_key), 
                                                                      axis=None))
-
-                        """if len(events.iloc[0][events.iloc[0] == event_time]) > 1 and "Merger" not in event_type:
-                            for key_ in events.iloc[1][events.iloc[0] == event_time]:
-                                if key_ not in tracked_key:
-                                    masses = events.iloc[3][(events.iloc[0] == event_time) & (events.iloc[2] == event_type)]
-                                    dt = int(np.floor(event_time.value_in(units.kyr)/10))
-                                    parti_set = read_set_from_file(sim_snapshot[dt], "hdf5")
-                                    for mass_ in masses[masses != event_mass]:
-                                        components = parti_set.connected_components(threshold = 
-                                                                                    2000 |units.au)
-                                        for c in components:
-                                            if len(c) > 1:
-                                                bin_combo = list(itertools.combinations(c, 2)) #All possible binaries in system
-                                                for bin_ in bin_combo:
-                                                    bin_sys = Particles()
-                                                    bin_sys.add_particle(bin_[0])
-                                                    bin_sys.add_particle(bin_[1])
-
-                                                    kepler_elements = orbital_elements_from_binary(bin_sys, G=constants.G)
-                                                    semimajor = kepler_elements[2]
-                                                    eccentric = kepler_elements[3]
-
-                                                    if semimajor < 1000 | units.au and eccentric < 1:
-                                                        if max(bin_sys.mass) < self.Star_min_mass:
-                                                            ejec_jj[fiter] += 1
-                                                            ejec_jmo[fiter] -= 2
-                                                        elif min(bin_sys.mass) >= self.Star_min_mass:
-                                                            ejec_ss[fiter] += 1
-                                                            ejec_star[fiter] -= 2
-                                                        else:
-                                                            ejec_js[fiter] += 1
-                                                            ejec_star[fiter] -= 1
-                                                            ejec_jmo[fiter] -= 1
-                                                        
-                                                        tracked_key = np.asarray(np.concatenate((tracked_key, 
-                                                                                 [bin_[0].key, bin_[1].key]), 
-                                                                                 axis=None))"""
-
                     fiter += 1
 
             complete_data = [merge_jj, merge_js, merge_ss, ejec_jmo, 
@@ -395,7 +354,6 @@ class FinalInitialProperties(object):
                         IQR_low, IQR_high = np.percentile(val_, [25, 75])
                         q1 = median - IQR_low
                         q3 = IQR_high - median
-                    
                         lines = ["Raw {} Data: {}".format(prop_, val_),
                                 "Median: {}".format(median),
                                 "IQR Low: {}, IQR High: {}".format(q1, q3)]
@@ -410,8 +368,6 @@ class FinalInitialProperties(object):
         
         directory = "data/Simulation_Data/"+str(self.models[model_iter])+"/"
         dir_configs = natsort.natsorted(glob.glob(os.path.join(str(directory)+"simulation_snapshot/**")))
-        Nsims = len(dir_configs)
-
         if (dt_crop):
             fname = "plotters/figures/system_evolution/"+str(self.models[model_iter])+"_sem_ecc_mixed_systs_crop.pdf"
             tname = self.models[model_iter]+'_syst_info_crop.txt'
@@ -421,6 +377,7 @@ class FinalInitialProperties(object):
 
         flatten_mkeys = self.plot_func.flatten_arr(self.fin_mkeys, model_iter)
         done_keys = flatten_mkeys
+        Nsims = len(dir_configs)
 
         #Process N > 2 Systems
         mpops = [ ]
@@ -439,6 +396,7 @@ class FinalInitialProperties(object):
                         temp_mtype.append("JuMBOs")
                     else:
                         temp_mtype.append("star")
+
             if len(temp_key) > 2:
                 mpops.append(len(temp_key))
                 mtype.append(sorted(temp_mtype))
@@ -490,7 +448,6 @@ class FinalInitialProperties(object):
         mix_sem = [ ]
         mix_ecc = [ ]
         mix_masses = [ ]
-
         final_jmb_keys = [ ]
         final_jmb_runs = [ ]
 
@@ -501,7 +458,7 @@ class FinalInitialProperties(object):
                 if key_ in done_keys:
                     proc = False
                 else:
-                    done_keys = np.concatenate((done_keys, key_), axis = None)
+                    done_keys = np.concatenate((done_keys, key_), axis=None)
             if (proc):
                 masses = self.fin_bmass[model_iter][jmb_idx_]
                 run_idx = self.fin_bsim_iter[model_iter][jmb_idx_]-1
@@ -524,7 +481,7 @@ class FinalInitialProperties(object):
                 if key_ in done_keys:
                     proc = False
                 else:
-                    done_keys = np.concatenate((done_keys, key_), axis = None)
+                    done_keys = np.concatenate((done_keys, key_), axis=None)
             if (proc):
                 masses = self.fin_bmass[model_iter][syst_]
                 run_idx = self.fin_bsim_iter[model_iter][syst_]-1
@@ -545,9 +502,8 @@ class FinalInitialProperties(object):
         for fkey_, run_idx in zip(final_jmb_keys, final_jmb_runs):
             for ikey_ in self.init_bkeys[model_iter]:
                 sorted_ikey = sorted(ikey_)
-                fkey1 = str(fkey_[0])[0] + "." + str(fkey_[0])[1:]
-                fkey2 = str(fkey_[1])[0] + "." + str(fkey_[1])[1:]
-
+                fkey1 = str(fkey_[0])[0]+"."+str(fkey_[0])[1:]
+                fkey2 = str(fkey_[1])[0]+"."+str(fkey_[1])[1:]
                 if fkey1[:14] == str(sorted_ikey[0])[:14] \
                     and fkey2[:14] == str(sorted_ikey[1])[:14]:
                     same_init[run_idx] += 1
@@ -557,7 +513,7 @@ class FinalInitialProperties(object):
         with open(os.path.join("plotters/figures/system_evolution/outputs/", 
                   tname), 'w') as f:
             complete_data = [jmb_bin, new_jmb, str_bin, mix_bin, 
-                            mix_sem, mix_ecc, mix_masses, unique_pops]
+                             mix_sem, mix_ecc, mix_masses, unique_pops]
             complete_string = ["JuMBO Systs", "New JuMBOs", "SS Systs", 
                                "JS Systs", "JS Semi-major", "JS Eccentricity", 
                                "JS masses", "N>2 Populations"]
@@ -595,11 +551,11 @@ class FinalInitialProperties(object):
             f = np.reshape(kernel(positions).T, xx.shape)
 
             fig, ax = plt.subplots()
-            cfset = ax.contourf(xx, yy, f, cmap="Blues", levels = 7, zorder = 1)
-            cset = ax.contour(xx, yy, f, colors = "black", levels = 7, zorder = 2)
+            cfset = ax.contourf(xx, yy, f, cmap="Blues", levels=7, zorder=1)
+            cset = ax.contour(xx, yy, f, colors="black", levels=7, zorder=2)
             ax.clabel(cset, inline=1, fontsize=10)
-            ax.set_xlabel(r"$a$ [au]", fontsize = self.clean_plot.axlabel_size)
-            ax.set_ylabel(r"$e$", fontsize = self.clean_plot.axlabel_size)
+            ax.set_xlabel(r"$a$ [au]", fontsize=self.clean_plot.axlabel_size)
+            ax.set_ylabel(r"$e$", fontsize=self.clean_plot.axlabel_size)
             ax.set_xlim(0,1000)
             ax.set_ylim(0,1)
             self.clean_plot.tickers(ax, "hist")
@@ -616,13 +572,13 @@ class FinalInitialProperties(object):
         with open(file, 'r', newline ='') as file:
             csv_reader = csv.reader(file)
             for row_ in csv_reader:
-                mass1 = float(row_[3]) * (1 | units.MSun)/(1 | units.MJupiter)
-                mass2 = float(row_[5]) * (1 | units.MSun)/(1 | units.MJupiter)
-                proj_sep.append(float(row_[7]))
-                q = min(mass1/mass2, mass2/mass1)
+                mass1 = float(row_[3])*self.mratio
+                mass2 = float(row_[5])*self.mratio
+
+                max_mass, min_mass, q = self.bin_mass_property(mass1, mass2)
                 q_obs.append(q)
-                max_mass = max(mass1, mass2)
                 mprim_obs.append(max_mass)
+                proj_sep.append(float(row_[7]))
         
         obs_sort = np.sort(mprim_obs)
         obs_iter = np.asarray([i for i in enumerate(obs_sort)])
@@ -630,8 +586,8 @@ class FinalInitialProperties(object):
         obs_iter /= max(obs_iter)
 
         fig, ax = plt.subplots()
-        ax.plot(obs_sort, obs_iter, color = "black", 
-                linewidth = 2.5, label = "Observation")
+        ax.plot(obs_sort, obs_iter, color="black", 
+                linewidth=2.5, label="Observation")
         labels, plot_labels, extra_str = self.clean_plot.model_layout(model_choices)
         if (dt_crop):
             fname = "plotters/figures/binary_evolution/"+str(extra_str)+"mprim_crop.pdf"
@@ -646,9 +602,9 @@ class FinalInitialProperties(object):
 
             if self.models[model_iter] != "Fractal_rvir0.5_FFOnly":
                 init_pmass = [ ]
-                for syst_ in range(len(self.init_bmass[model_iter])):
-                    mass1 = self.init_bmass[model_iter][syst_][0] * (1 | units.MSun)/(1 | units.MJupiter)
-                    mass2 = self.init_bmass[model_iter][syst_][1] * (1 | units.MSun)/(1 | units.MJupiter)
+                for binm_ in self.init_bmass[model_iter]:
+                    mass1 = binm_[0]*self.mratio
+                    mass2 = binm_[1]*self.mratio
                     max_mass = max(mass1, mass2)
                     init_pmass.append(max_mass)
                 simi_sort = np.sort(init_pmass)
@@ -656,17 +612,17 @@ class FinalInitialProperties(object):
                 simi_iter = simi_iter[:,0]
                 simi_iter /= max(simi_iter)
                 if model_iter == 0:
-                    ax.plot(simi_sort, simi_iter, label = "Initial", 
-                            color = "black", zorder = 1)
+                    ax.plot(simi_sort, simi_iter, label="Initial", 
+                            color="black", zorder=1)
                 elif model_iter == 4:
-                    ax.plot(simi_sort, simi_iter, label = "Initial", 
-                            color = "black", zorder = 1)
+                    ax.plot(simi_sort, simi_iter, label="Initial", 
+                            color="black", zorder=1)
                 elif model_iter == 8:
-                    ax.plot(simi_sort, simi_iter, label = "Initial", 
-                            color = "black", zorder = 1)
+                    ax.plot(simi_sort, simi_iter, label="Initial", 
+                            color="black", zorder=1)
                 elif model_choices == [1,7] or model_choices == [1,10]:
-                    ax.plot(simi_sort, simi_iter, label = "Init. "+str(labels[iloop]), 
-                            linestyle = self.linestyles[iloop], color = "black", zorder = 1)
+                    ax.plot(simi_sort, simi_iter, label="Init. "+str(labels[iloop]), 
+                            linestyle=self.linestyles[iloop], color="black", zorder=1)
 
             fin_pmass = [ ]
             for idx_ in self.jmb_idx[model_iter]:
@@ -677,10 +633,11 @@ class FinalInitialProperties(object):
                     else:
                         done_keys = np.concatenate((done_keys, key_), axis = None)
                 if (proc):
-                    mass1 = self.fin_bmass[model_iter][idx_][0] * (1 | units.MSun)/(1 | units.MJupiter)
-                    mass2 = self.fin_bmass[model_iter][idx_][1] * (1 | units.MSun)/(1 | units.MJupiter)
-                    if (max(mass1, mass2)) <= self.JuMBO_max_mass.value_in(units.MJupiter):
-                        fin_pmass.append(max(mass1, mass2))
+                    mass1 = self.fin_bmass[model_iter][idx_][0]*self.mratio
+                    mass2 = self.fin_bmass[model_iter][idx_][1]*self.mratio
+                    max_mass = max(mass1, mass2)
+                    if max_mass <= self.JuMBO_max_mass.value_in(units.MJupiter):
+                        fin_pmass.append(max_mass)
                 
             for syst_ in range(len(self.fin_bkeys[model_iter])):
                 proc = True
@@ -690,23 +647,24 @@ class FinalInitialProperties(object):
                     else:
                         done_keys = np.concatenate((done_keys, key_), axis = None)
                 if (proc):
-                    mass1 = self.fin_bmass[model_iter][syst_][0] * (1 | units.MSun)/(1 | units.MJupiter)
-                    mass2 = self.fin_bmass[model_iter][syst_][1] * (1 | units.MSun)/(1 | units.MJupiter)
-                    if (max(mass1, mass2)) <= self.JuMBO_max_mass.value_in(units.MJupiter):
-                        fin_pmass.append(max(mass1, mass2))
+                    mass1 = self.fin_bmass[model_iter][syst_][0]*self.mratio
+                    mass2 = self.fin_bmass[model_iter][syst_][1]*self.mratio
+                    max_mass = max(mass1, mass2)
+                    if max_mass <= self.JuMBO_max_mass.value_in(units.MJupiter):
+                        fin_pmass.append(max_mass)
                         
             simf_sort = np.sort(fin_pmass)
             simf_iter = np.asarray([i for i in enumerate(simf_sort)])
             simf_iter = simf_iter[:,0]
             simf_iter /= max(simf_iter)
-            ax.plot(simf_sort, simf_iter, label = labels[iloop], 
-                    color = self.colours[iloop], linestyle = "-.")
+            ax.plot(simf_sort, simf_iter, label=labels[iloop], 
+                    color=self.colours[iloop], linestyle="-.")
             iloop += 1
             
         self.clean_plot.tickers(ax, "plot")
         ax.set_xlabel(r"$M_{\mathrm{prim}} [\mathrm{M}_{\mathrm{Jup}}]$", 
-                      fontsize = self.clean_plot.axlabel_size)
-        ax.set_ylabel(r"$f_{<M_{\mathrm{prim}}}$", fontsize = self.clean_plot.axlabel_size)
+                      fontsize=self.clean_plot.axlabel_size)
+        ax.set_ylabel(r"$f_{<M_{\mathrm{prim}}}$", fontsize=self.clean_plot.axlabel_size)
         ax.set_ylim(0, 1)
         ax.legend(prop={'size': self.clean_plot.axlabel_size})
         fig.savefig(fname, dpi=700, bbox_inches='tight')
@@ -728,11 +686,11 @@ class FinalInitialProperties(object):
         with open(file, 'r', newline ='') as file:
             csv_reader = csv.reader(file)
             for row_ in csv_reader:
-                mass1 = float(row_[3]) * (1 | units.MSun)/(1 | units.MJupiter)
-                mass2 = float(row_[5]) * (1 | units.MSun)/(1 | units.MJupiter)
-                q = min(mass1/mass2, mass2/mass1)
+                mass1 = float(row_[3])*self.mratio
+                mass2 = float(row_[5])*self.mratio
+
+                max_mass, min_mass, q = self.bin_mass_property(mass1, mass2)
                 q_obs.append(q)
-                max_mass = max(mass1, mass2)
                 mprim_obs.append(max_mass)
 
         flatten_mkeys = self.plot_func.flatten_arr(self.fin_mkeys, model_iter)
@@ -749,13 +707,13 @@ class FinalInitialProperties(object):
                 else:
                     done_keys = np.concatenate((done_keys, key_), axis=None)
             if (proc):
-                mass1 = self.fin_bmass[model_iter][idx_][0] * (1 | units.MSun)/(1 | units.MJupiter)
-                mass2 = self.fin_bmass[model_iter][idx_][1] * (1 | units.MSun)/(1 | units.MJupiter)
-                if (max(mass1, mass2)) <= self.JuMBO_max_mass.value_in(units.MJupiter):
-                    q = min(mass1/mass2, mass2/mass1)
+                mass1 = self.fin_bmass[model_iter][idx_][0]*self.mratio
+                mass2 = self.fin_bmass[model_iter][idx_][1]*self.mratio
+                max_mass, min_mass, q = self.bin_mass_property(mass1, mass2)
+                if max_mass <= self.JuMBO_max_mass.value_in(units.MJupiter):
                     fin_q.append(q)
-                    fin_pmass.append(max(mass1, mass2))
-                    fin_smass.append(min(mass1, mass2))
+                    fin_pmass.append(max_mass)
+                    fin_smass.append(min_mass)
             
         for syst_ in range(len(self.fin_bkeys[model_iter])):
             proc = True
@@ -765,13 +723,13 @@ class FinalInitialProperties(object):
                 else:
                     done_keys = np.concatenate((done_keys, key_), axis = None)
             if (proc):
-                mass1 = self.fin_bmass[model_iter][syst_][0] * (1 | units.MSun)/(1 | units.MJupiter)
-                mass2 = self.fin_bmass[model_iter][syst_][1] * (1 | units.MSun)/(1 | units.MJupiter)
-                if (max(mass1, mass2)) <= self.JuMBO_max_mass.value_in(units.MJupiter):
-                    q = min(mass1/mass2, mass2/mass1)
+                mass1 = self.fin_bmass[model_iter][syst_][0]*self.mratio
+                mass2 = self.fin_bmass[model_iter][syst_][1]*self.mratio
+                max_mass, min_mass, q = self.bin_mass_property(mass1, mass2)
+                if max_mass <= self.JuMBO_max_mass.value_in(units.MJupiter):
                     fin_q.append(q)
-                    fin_pmass.append(max(mass1, mass2))
-                    fin_smass.append(min(mass1, mass2))
+                    fin_pmass.append(max_mass)
+                    fin_smass.append(min_mass)
             
         xlims = [0, 14]
         ylims = [0, 1.001]
@@ -783,17 +741,17 @@ class FinalInitialProperties(object):
         f = np.reshape(kernel(positions).T, xx.shape)
 
         fig, ax = plt.subplots()
-        cfset = ax.contourf(xx, yy, f, cmap="Blues", levels = 7, zorder = 1)
-        cset = ax.contour(xx, yy, f, colors = "k", levels = 7, zorder = 2)
+        cfset = ax.contourf(xx, yy, f, cmap="Blues", levels=7, zorder=1)
+        cset = ax.contour(xx, yy, f, colors="k", levels=7, zorder=2)
         ax.clabel(cset, inline=1, fontsize=10)
         ax.set_xlabel(r'$M_{\mathrm{prim}} [M_{\mathrm{Jup}}]$', 
-                      fontsize = self.clean_plot.axlabel_size)
-        ax.set_ylabel(r'$q$', fontsize = self.clean_plot.axlabel_size)
-        ax.scatter(mprim_obs, q_obs, marker = "X", color = "red", 
-                   edgecolor = "black", zorder = 3)
+                      fontsize=self.clean_plot.axlabel_size)
+        ax.set_ylabel(r'$q$', fontsize=self.clean_plot.axlabel_size)
+        ax.scatter(mprim_obs, q_obs, marker="X", color="red", 
+                   edgecolor="black", zorder=3)
         self.clean_plot.tickers(ax, "hist")
-        ax.set_xlim(0, 14)
-        ax.set_ylim(0, 1.001)
+        ax.set_xlim(xlims[0], xlims[1])
+        ax.set_ylim(ylims[0], ylims[1])
         fig.savefig(fname, dpi=700, bbox_inches='tight')
         plt.close() 
 
@@ -821,6 +779,7 @@ class FinalInitialProperties(object):
                 f.write(line_+'\n')
 
     def obs_scatter(self, model_iter, dt_crop):
+        """Plot Mprim vs. rsep of the observed JuMBOs"""
 
         if (dt_crop):
             fname = "plotters/figures/obs_q_mprim_sep_crop.pdf"
@@ -834,13 +793,13 @@ class FinalInitialProperties(object):
         with open(file, 'r', newline ='') as file:
             csv_reader = csv.reader(file)
             for row_ in csv_reader:
-                mass1 = float(row_[3]) * (1 | units.MSun)/(1 | units.MJupiter)
-                mass2 = float(row_[5]) * (1 | units.MSun)/(1 | units.MJupiter)
-                proj_sep.append(float(row_[7]))
-                q = min(mass1/mass2, mass2/mass1)
+                mass1 = float(row_[3])*self.mratio
+                mass2 = float(row_[5])*self.mratio
+
+                max_mass, min_mass, q = self.bin_mass_property(mass1, mass2)
                 q_obs.append(q)
-                max_mass = max(mass1, mass2)
                 mprim_obs.append(max_mass)
+                proj_sep.append(float(row_[7]))
 
         flatten_mkeys = self.plot_func.flatten_arr(self.fin_mkeys, model_iter)
         done_keys = flatten_mkeys
@@ -857,8 +816,8 @@ class FinalInitialProperties(object):
                     done_keys = np.concatenate((done_keys, key_), axis=None)
             if (proc):
                 masses = self.fin_bmass[model_iter][idx_]
-                m1 = masses[0] * (1 | units.MSun)/(1 | units.MJupiter)
-                m2 = masses[1] * (1 | units.MSun)/(1 | units.MJupiter)
+                m1 = masses[0]*self.mratio
+                m2 = masses[1]*self.mratio
                 mprim = max(m1, m2)
                 if (mprim * (1 | units.MJupiter)) < self.Star_min_mass:
                     q = min(m1,m2)/mprim
@@ -875,8 +834,8 @@ class FinalInitialProperties(object):
                     done_keys = np.concatenate((done_keys, key_), axis=None)
             if (proc):
                 masses = self.fin_bmass[model_iter][syst_]
-                m1 = masses[0] * (1 | units.MSun)/(1 | units.MJupiter)
-                m2 = masses[1] * (1 | units.MSun)/(1 | units.MJupiter)
+                m1 = masses[0]*self.mratio
+                m2 = masses[1]*self.mratio
                 mprim = max(m1, m2)
                 if (mprim * (1 | units.MJupiter)) < self.Star_min_mass:
                     q = min(m1,m2)/mprim
@@ -889,15 +848,16 @@ class FinalInitialProperties(object):
             mprim_sim.append(max(bin_[0], bin_[1]))
 
         fig, ax = plt.subplots()
-        ax.hist2d(np.log10(fin_jmb_mprim), fin_jmb_semi, bins=100, range=([-0.5,1.8],[0,1000]), cmap='viridis')
-        #ax.scatter(np.log10(fin_jmb_mprim[100:150]), fin_jmb_semi[100:150], c = fin_jmb_q[100:150])
-        colour_axes = ax.scatter(np.log10(mprim_obs), proj_sep, label = "Observation",
-                                 c = q_obs, edgecolors="black")
+        ax.hist2d(np.log10(fin_jmb_mprim), fin_jmb_semi, bins=100, 
+                  range=([-0.5,1.8],[0,1000]), cmap='viridis')
+        colour_axes = ax.scatter(np.log10(mprim_obs), proj_sep, 
+                                 label="Observation", c=q_obs, 
+                                 edgecolors="black")
         cbar = plt.colorbar(colour_axes, ax=ax)
-        cbar.set_label(label = r'$q$', fontsize = self.clean_plot.axlabel_size)
+        cbar.set_label(label=r'$q$', fontsize=self.clean_plot.axlabel_size)
         ax.set_xlabel(r'$M_{\mathrm{prim}}\ [ \mathrm{M}_{\mathrm{Jup}} ]$', 
-                      fontsize = self.clean_plot.axlabel_size)
-        ax.set_ylabel(r'$r_{ij}$ [au]', fontsize = self.clean_plot.axlabel_size)
+                      fontsize=self.clean_plot.axlabel_size)
+        ax.set_ylabel(r'$r_{ij}$ [au]', fontsize=self.clean_plot.axlabel_size)
         ax.legend(prop={'size': self.clean_plot.axlabel_size})
         plt.savefig(fname, dpi=300, bbox_inches='tight')
         plt.clf()
@@ -913,8 +873,8 @@ class FinalInitialProperties(object):
             csv_reader = csv.reader(file)
             for row_ in csv_reader:
                 proj_sep.append(float(row_[7]))
-                mass1 = float(row_[3]) * (1 | units.MSun)/(1 | units.MJupiter)
-                mass2 = float(row_[5]) * (1 | units.MSun)/(1 | units.MJupiter)
+                mass1 = float(row_[3])*self.mratio
+                mass2 = float(row_[5])*self.mratio
                 max_mass = max(mass1, mass2)
                 mprim_obs.append(max_mass)
 
@@ -923,8 +883,8 @@ class FinalInitialProperties(object):
         obs_iter = obs_iter[:,0]
         obs_iter /= max(obs_iter)
 
-        xlabel = [r'$e$', r'$a$ [au]', r'$r_{ij}$ [au]']
-        ylabel = [r'$f_{<e}$', r'$f_{<a}$', r'$f_{<r_{ij}}$']
+        xlabel=[r'$e$', r'$a$ [au]', r'$r_{ij}$ [au]']
+        ylabel=[r'$f_{<e}$', r'$f_{<a}$', r'$f_{<r_{ij}}$']
         file_name = ["eccentricity", "sem_axis", "proj_sep"]
         leg_txt, plot_label, extra_str = self.clean_plot.model_layout(model_choices)
 
@@ -960,11 +920,11 @@ class FinalInitialProperties(object):
 
             fig, ax = plt.subplots()  
             ax.set_ylim(0,1)
-            ax.set_xlabel(xlabel[plot_], fontsize = self.clean_plot.axlabel_size)
-            ax.set_ylabel(ylabel[plot_], fontsize = self.clean_plot.axlabel_size)
+            ax.set_xlabel(xlabel[plot_], fontsize=self.clean_plot.axlabel_size)
+            ax.set_ylabel(ylabel[plot_], fontsize=self.clean_plot.axlabel_size)
             if file_name[plot_] == "sem_axis":
-                ax.plot(obs_sort, obs_iter, color = "black", 
-                        linewidth = 2.5, label = "Observation")
+                ax.plot(obs_sort, obs_iter, color="black", 
+                        linewidth=2.5, label="Observation")
             if file_name[plot_] != "proj_sep" and file_name[plot_] != "sem_axis":
                 direc = "plotters/figures/binary_evolution/backup/"
 
@@ -1025,29 +985,31 @@ class FinalInitialProperties(object):
                 if file_name[plot_] == "proj_sep":
                     fsorta, fpopa = self.plot_func.cdf_plotter(fin_jmb_sem)
                     if k_ == 0:
-                        ax.plot(fsorta, fpopa, color = self.colours[k_], label = r"$a$", alpha = 0.5, zorder = 0)
+                        ax.plot(fsorta, fpopa, color=self.colours[k_], 
+                                label=r"$a$", alpha=0.5, zorder=0)
                     else:
-                        ax.plot(fsorta, fpopa, color = self.colours[k_], alpha = 0.5)
+                        ax.plot(fsorta, fpopa, color=self.colours[k_], alpha=0.5)
 
                 if file_name[plot_] != "proj_sep":
                     if model_choices[k_] == 0:
-                        ax.plot(isort, ipop, color = "black", label = "Initial", zorder = 1)
+                        ax.plot(isort, ipop, color="black", 
+                                label="Initial", zorder=1)
                     elif model_choices[k_] == 4:
-                        ax.plot(isort, ipop, color = "black", label = "Initial", zorder = 1)
+                        ax.plot(isort, ipop, color="black", 
+                                label="Initial", zorder=1)
                     elif model_choices[k_] == 8:
-                        ax.plot(isort, ipop, color = "black", label = "Initial", zorder = 1)
+                        ax.plot(isort, ipop, color="black", 
+                                label="Initial", zorder=1)
                     elif model_choices == [1,7] or model_choices == [1,10]:
-                        ax.plot(isort, ipop, label = "Init. "+str(leg_txt[k_]), 
-                                linestyle = self.linestyles[k_], color = "black", zorder = 1)
+                        ax.plot(isort, ipop, label="Init. "+str(leg_txt[k_]), 
+                                linestyle=self.linestyles[k_], color="black", 
+                                zorder=1)
                     elif model_choices == [1,7,10] and model_choices[k_] != 7:
-                        ax.plot(isort, ipop, label = "Init. "+str(leg_txt[k_]), 
-                                linestyle = self.linestyles[k_], color = "black", zorder = 1)
-
-                ax.plot(fsort, fpop, label = leg_txt[k_], 
-                        color = self.colours[k_], linestyle = "-.")
-                if file_name[plot_] == "sem_axis":
-                    fsortc, fpopc = self.plot_func.cdf_plotter(fin_jmb_cropped)
-                    #ax.plot(fsortc, fpopc, color = self.colours[k_], linestyle = ":")
+                        ax.plot(isort, ipop, label="Init. "+str(leg_txt[k_]), 
+                                linestyle=self.linestyles[k_], color="black", 
+                                zorder=1)
+                ax.plot(fsort, fpop, label=leg_txt[k_], 
+                        color=self.colours[k_], linestyle="-.")
                 fvals[k_].append(fin_jmb)
                 nsamp[k_].append(nsamples)
                 ncrop[k_].append(nsamples_cropped)
@@ -1086,13 +1048,15 @@ class FinalInitialProperties(object):
                 q121 = np.median(frac1) - q121
                 q321 -= np.median(frac1)
 
-                lines = np.concatenate((lines, [str(self.models[model_choices[0]])+": Fraction > 25au Sep: "+str(frac0), "IQR "+str(q120)+", "+str(q320),
-                                                str(self.models[model_choices[mcomp]])+"Fraction > 25au Sep: "+str(frac1), "IQR "+str(q121)+", "+str(q321)]),
-                                      axis=None)
+                line1 = str(self.models[model_choices[0]])+": Fraction > 25au Sep: "\
+                       +str(frac0), "IQR "+str(q120)+", "+str(q320)
+                line2 = str(self.models[model_choices[mcomp]])+"Fraction > 25au Sep: "\
+                       +str(frac1), "IQR "+str(q121)+", "+str(q321)
+                lines = np.concatenate((lines, [line1, line2]),
+                                        axis=None)
             with open(os.path.join(output_path, tname), 'w') as f:
                 for line_ in lines:
                     f.write(line_+'\n')
-
 
     def time_evol_nJumbo(self, model_choices):
         """Plot evolution of nJuMBO in time"""
@@ -1128,21 +1092,27 @@ class FinalInitialProperties(object):
             vals = min(vals[np.isfinite(vals)])
             miny = min(vals, miny)
             
-            ax.plot(time, np.log10(med_fJuMBO.iloc[:,0]), color = self.colours[fiter], label = leg_txt[fiter])
-            ax.plot(time, np.log10(IQR_high.iloc[:,0]), color = self.colours[fiter], alpha = 0.3)
-            ax.plot(time, np.log10(IQR_low.iloc[:,0]), color = self.colours[fiter], alpha = 0.3)
-            ax.fill_between(time, np.log10(IQR_low.iloc[:,0]), np.log10(IQR_high.iloc[:,0]), color = self.colours[fiter], alpha = 0.3)
-            ax.scatter(time[nearest_idx], np.log10(med_fJuMBO.iloc[nearest_idx]), color = self.colours[fiter], zorder = 5)
+            ax.plot(time, np.log10(med_fJuMBO.iloc[:,0]), 
+                    color=self.colours[fiter], label=leg_txt[fiter])
+            ax.plot(time, np.log10(IQR_high.iloc[:,0]), 
+                    color=self.colours[fiter], alpha=0.3)
+            ax.plot(time, np.log10(IQR_low.iloc[:,0]), 
+                    color=self.colours[fiter], alpha=0.3)
+            ax.fill_between(time, np.log10(IQR_low.iloc[:,0]), np.log10(IQR_high.iloc[:,0]), 
+                            color=self.colours[fiter], alpha=0.3)
+            ax.scatter(time[nearest_idx], np.log10(med_fJuMBO.iloc[nearest_idx]), 
+                       color=self.colours[fiter], zorder=5)
             fiter += 1
-        ax.set_xlabel(r"$\log_{10} t$ [Myr]", fontsize = self.clean_plot.axlabel_size)
+        ax.set_xlabel(r"$\log_{10} t$ [Myr]", fontsize=self.clean_plot.axlabel_size)
         ax.set_xlim(-2,0)
         if model_choices == [3,4,5]:
-            ax.set_xlabel(r"$t$ [Myr]", fontsize = self.clean_plot.axlabel_size)
+            ax.set_xlabel(r"$t$ [Myr]", fontsize=self.clean_plot.axlabel_size)
             ax.set_xlim(0,1)
         if model_choices == [6]:
-            ax.set_xlabel(r"$t$ [Myr]", fontsize = self.clean_plot.axlabel_size)
+            ax.set_xlabel(r"$t$ [Myr]", fontsize=self.clean_plot.axlabel_size)
             ax.set_xlim(-2,1)
-        ax.set_ylabel(r"$\log_{10}(\langle N_{\mathrm{JuMBO}}\rangle/\langle N_{\mathrm{JMO}}\rangle)$", fontsize = self.clean_plot.axlabel_size)
+        ax.xaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+        ax.set_ylabel(r"$\log_{10}(\langle N_{\mathrm{JuMBO}}\rangle/\langle N_{\mathrm{JMO}}\rangle)$", fontsize=self.clean_plot.axlabel_size)
         ax.set_ylim(1.05*miny, 0)
         self.clean_plot.tickers(ax, "plot")
         ax.legend(prop={'size': self.clean_plot.axlabel_size})
@@ -1165,31 +1135,32 @@ class FinalInitialProperties(object):
                 time = np.linspace(0, 10, len(med_val))
                 time = np.log10(time)
             max_a = max(max_a, max(IQR_high.iloc[1:,0]))
-            ax.plot(time, med_val, color = self.colours[fiter], label = leg_txt[fiter])
-            ax.plot(time, IQR_high.iloc[:,0], color = self.colours[fiter], alpha = 0.6)
-            ax.plot(time, IQR_low.iloc[:,0], color = self.colours[fiter], alpha = 0.6)
-            ax.fill_between(time, IQR_low.iloc[:,0], IQR_high.iloc[:,0], color = self.colours[fiter], alpha = 0.3)
+            ax.plot(time, med_val, color=self.colours[fiter], label=leg_txt[fiter])
+            ax.plot(time, IQR_high.iloc[:,0], color=self.colours[fiter], alpha=0.6)
+            ax.plot(time, IQR_low.iloc[:,0], color=self.colours[fiter], alpha=0.6)
+            ax.fill_between(time, IQR_low.iloc[:,0], IQR_high.iloc[:,0], 
+                            color=self.colours[fiter], alpha=0.3)
             if model_iter != 3 and model_iter != 4 and model_iter != 5:
                 frac_dt = idx_frac[fiter]
             else:
                 frac_dt = -1
-            ax.scatter(time[frac_dt], med_val.iloc[frac_dt], color = self.colours[fiter], zorder = 5)
+            ax.scatter(time[frac_dt], med_val.iloc[frac_dt], color=self.colours[fiter], zorder=5)
             with open(os.path.join("plotters/figures/system_evolution/outputs/"+self.models[model_iter]+'_evol.txt'), 'w') as f:
                 f.write(r"t = {:.1f} kyr, a = {:.1f}, IQR [{:.1f}, {:.1f}]".format(time[frac_dt+1], 
                         med_val.iloc[frac_dt,0], IQR_low.iloc[frac_dt,0], 
                         IQR_high.iloc[frac_dt,0]))
             fiter += 1
-        ax.set_xlabel(r"$\log_{10} t$ [Myr]", fontsize = self.clean_plot.axlabel_size)
+        ax.set_xlabel(r"$\log_{10} t$ [Myr]", fontsize=self.clean_plot.axlabel_size)
         ax.set_xlim(-2,0)
         if model_choices == [3,4,5]:
-            ax.set_xlabel(r"$t$ [Myr]", fontsize = self.clean_plot.axlabel_size)
+            ax.set_xlabel(r"$t$ [Myr]", fontsize=self.clean_plot.axlabel_size)
             ax.set_xlim(0,1)
         if model_choices == [6]:
-            ax.set_xlabel(r"$t$ [Myr]", fontsize = self.clean_plot.axlabel_size)
+            ax.set_xlabel(r"$t$ [Myr]", fontsize=self.clean_plot.axlabel_size)
             ax.set_xlim(-2,1)
-        print(max_a)
+            
         ax.set_ylim(0.01, 1.05*max_a)
-        ax.set_ylabel(r"$a$ [au]", fontsize = self.clean_plot.axlabel_size)
+        ax.set_ylabel(r"$a$ [au]", fontsize=self.clean_plot.axlabel_size)
         self.clean_plot.tickers(ax, "plot")
         ax.legend(prop={'size': self.clean_plot.axlabel_size})
         plt.savefig("plotters/figures/system_evolution/"+str(extra_str)+"sem_evol.pdf", dpi=700, bbox_inches='tight')
@@ -1211,16 +1182,16 @@ class FinalInitialProperties(object):
                 for row_ in output:
                     time = float(row_[0][4:-3])
                     file_idx = int(np.floor(time/10))
-            fname = "plotters/figures/system_evolution/two_point_corr"+str(self.models[model_iter])+"_crop.pdf"
+            fname = "plotters/figures/system_evolution/two_point_corr"+str(self.models[model_iter])+"_crop_jmo.pdf"
         else:
             file_idx = -1
-            fname = "plotters/figures/system_evolution/two_point_corr"+str(self.models[model_iter])+".pdf"
+            fname = "plotters/figures/system_evolution/two_point_corr"+str(self.models[model_iter])+"_jmo.pdf"
 
         jmo_jmo_arr = [ ]
-        jmb_jmo_arr = [ ]
-        jmb_jmb_arr = [ ]
+        #jmb_jmo_arr = [ ]
+        #jmb_jmb_arr = [ ]
         str_str_arr = [ ]
-        str_jmb_arr = [ ]
+        #str_jmb_arr = [ ]
         str_jmo_arr = [ ]
 
         citer = 1
@@ -1230,71 +1201,16 @@ class FinalInitialProperties(object):
             print("Reading file #", file_no)
 
             sim_snapshot = natsort.natsorted(glob.glob(os.path.join(config_+"/*")))[file_idx]
-            mass = [ ]
-            key = [ ]
-            mkey = [ ]
-            iter = 0 
-            for run_ in self.fin_bsim_iter[model_iter]:
-                if run_ == citer:
-                    mass = np.concatenate((mass, self.fin_bmass[model_iter][iter]))
-                    key = np.concatenate((key, self.fin_bkeys[model_iter][iter]))
-                iter += 1
-
-            iter = 0
-            for run_ in self.fin_msim_iter[model_iter]:
-                if run_ == citer:
-                    mkey = np.concatenate((mkey, self.fin_mkeys[model_iter][iter]))
-                iter += 1
-                
             data = read_set_from_file(sim_snapshot, "hdf5")
             star = data[data.mass >= self.Star_min_mass]
-            jmo = data[data.mass < self.Star_min_mass]
-            det_jmb = False
-            for dmass_, mass_ in itertools.product(jmo.key, key):
-                dmass_str = str(dmass_)[1:9]
-                mass_str = str(mass_)[2:10]
-                if dmass_str == mass_str:
-                    idx = np.where(key == mass_)[0]
-                    if len(idx) > 1:
-                        for idx_ in idx:
-                            if idx_%2 == 0:
-                                pidx = idx_+1
-                            else:
-                                pidx = idx_-1
-                            pmass = mass[pidx] * (1 | units.MSun)
-                            if pmass < self.Star_min_mass:
-                                jmo[jmo.key == dmass_].jmb = 1
-                                det_jmb = True
-                    else:
-                        if idx%2 == 0:
-                            pidx = idx+1
-                        else:
-                            pidx = idx-1
-                        pmass = mass[pidx] * (1 | units.MSun)
-                        if pmass < self.Star_min_mass:
-                            jmo[jmo.key == dmass_].jmb = 1
-                            det_jmb = True
-
-            if (det_jmb):
-                jumbo = jmo[jmo.jmb == 1]
-            else:
-                print("Curious")
-                jumbo = data - data
-            print(len(jumbo))
-            FF = data - star - jumbo
+            FF = data[data.mass < self.Star_min_mass]
             
-            jmo_jmo = [ ]
-            jmb_jmo = [ ]
-            jmb_jmb = [ ]
             str_str = [ ]
-            str_jmb = [ ]
             str_jmo = [ ]
-
-            pset = [data, jumbo, FF]
-            str_dist_arr = [str_str, str_jmb, str_jmo]
+            pset = [data, FF]
+            str_dist_arr = [str_str, str_jmo]
             for star_ in star:
-                sdata = star - star_
-                pset[0] = sdata
+                pset[0] = star - star_
                 for type_, darr_ in zip(pset, str_dist_arr):
                     if len(type_) > 0:
                         dx = type_.x - star_.x
@@ -1303,62 +1219,43 @@ class FinalInitialProperties(object):
                         dist = np.sqrt(dx**2+dy**2+dz**2)
                         darr_.append(min(dist).value_in(units.au))
             
-            pset = [jumbo, FF]
-            print(jumbo, jmb_jmb)
-            jmb_dist_arr = [jmb_jmb, jmb_jmo]
-            for jmb_ in jumbo:
-                pset[0] = jumbo - jmb_
-                for type_, darr_ in zip(pset, jmb_dist_arr):
-                    if len(type_) > 0:
-                        dx = type_.x - jmb_.x
-                        dy = type_.y - jmb_.y
-                        dz = type_.z - jmb_.z
-                        dist = np.sqrt(dx**2+dy**2+dz**2)
-                        if len(dist) > 1:
-                            dist_jmb = np.sort(dist)[1]
-                        else:
-                            dist_jmb = dist[0]
-                            print(dist_jmb)
-                        if len(type_) == len(pset[0]):
-                            darr_.append(dist_jmb.value_in(units.au))
-                        else:
-                            darr_.append(min(dist).value_in(units.au))
-
+            jmo_jmo = [ ]
             for jmo_ in FF:
-                pset = FF -jmo_
+                pset = FF - jmo_
                 dx = jmo_.x - pset.x
                 dy = jmo_.y - pset.y
                 dz = jmo_.z - pset.z
                 dist = np.sqrt(dx**2+dy**2+dz**2)
-                jmo_jmo.append(min(dist).value_in(units.au))
+                if len(dist) >0:
+                    jmo_jmo.append(min(dist).value_in(units.au))
 
             jmo_jmo_arr = np.concatenate((jmo_jmo_arr, jmo_jmo), axis=None)
-            jmb_jmo_arr = np.concatenate((jmb_jmo_arr, jmb_jmo), axis=None)
-            jmb_jmb_arr = np.concatenate((jmb_jmb_arr, jmb_jmb), axis=None)
             str_str_arr = np.concatenate((str_str_arr, str_str), axis=None)
-            str_jmb_arr = np.concatenate((str_jmb_arr, str_jmb), axis=None)
             str_jmo_arr = np.concatenate((str_jmo_arr, str_jmo), axis=None)
 
             citer += 1
 
-        data_arr = [jmb_jmb_arr, jmb_jmo_arr, jmo_jmo_arr, 
-                    str_str_arr, str_jmb_arr, str_jmo_arr]
-        label_arr = ["JuMBO-JuMBO", "JuMBO-JMO", "JMO-JMO", 
-                     "Star-Star", "Star-JuMBO", "Star-JMO"]
-        colours_arr = ["Red", "Black", "darkviolet", "Blue", 
-                       "pink", "dodgerblue"]
+        data_arr = [str_str_arr, str_jmo_arr, jmo_jmo_arr]
+        label_arr = ["Star-Star", "Star-JMO", "JMO-JMO"]
+        colours_arr = ["Black", "Red", "Blue"]
 
-        fig, ax = plt.subplots()
-        ax.set_xlabel(r"$\log_{10} r_{ij}$ [au]", fontsize = self.clean_plot.axlabel_size)
-        ax.set_ylabel(r"$f_{<r_{ij}}$", fontsize = self.clean_plot.axlabel_size)
-        for data_, label_, colour_ in zip(data_arr, label_arr, colours_arr):
-            dsort = np.sort(data_)
-            diter = np.asarray([i for i in enumerate(dsort)])
-            diter = diter[:,0]
-            diter /= max(diter)
-            ax.plot(np.log10(dsort), diter, label = label_, color = colour_)
-        ax.set_ylim(0,1)
-        ax.legend(prop={'size': self.clean_plot.axlabel_size})
-        self.clean_plot.tickers(ax, "plot")
-        fig.savefig(fname, dpi=700, bbox_inches='tight')
-        plt.clf()
+        with open(os.path.join("plotters/figures/system_evolution/two_point_corr"+str(self.models[model_iter])+"_jmo.txt"), 'w') as f: 
+            f.write("Data for "+str(self.models[model_iter]))
+
+            fig, ax = plt.subplots()
+            ax.set_xlabel(r"$\log_{10} \zeta(r_i,r_j)}$ [au]", fontsize=self.clean_plot.axlabel_size)
+            ax.set_ylabel(r"$\log_{10} f_{<\zeta(r_i,r_j)}$", fontsize=self.clean_plot.axlabel_size)
+            for data_, label_, colour_ in zip(data_arr, label_arr, colours_arr):
+                dsort = np.sort(data_)
+                diter = np.asarray([i for i in enumerate(dsort)])
+                diter = diter[:,0]
+                diter /= max(diter)
+                fneigh = abs(dsort-400)
+                print(diter[fneigh == min(fneigh)])
+                print(diter, min(fneigh))
+                ax.plot(np.log10(dsort), np.log10(diter), label=label_, color=colour_)
+                f.write("\n"+str(label_)+"f(r< "+str(dsort[fneigh==min(fneigh)])+"au) = "+str(diter[fneigh==min(fneigh)]))
+            ax.legend(prop={'size': self.clean_plot.axlabel_size})
+            self.clean_plot.tickers(ax, "plot")
+            fig.savefig(fname, dpi=700, bbox_inches='tight')
+            plt.clf()

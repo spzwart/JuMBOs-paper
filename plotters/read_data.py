@@ -14,7 +14,12 @@ from amuse.units import units, constants
 
 class ReadData(object):
     def process_final_snapshot(self, model, dt_crop):
-        """Process final snapshot and store all detected binaries"""
+        """Process final snapshot and store all detected binaries
+        
+           Inputs:
+           model:   Model to process data of
+           dt_crop: Boolean (1 dt(Njmb/NJMO = 0.09) || 0 Final dt)
+        """
 
         dir_path = "data/Simulation_Data/"+str(model)+"/"
         dir_configs = glob.glob(os.path.join(dir_path+"simulation_snapshot/**"))
@@ -39,20 +44,10 @@ class ReadData(object):
         no_sim_rn = 0
         for config_ in dir_configs:
             file_name = natsort.natsorted(glob.glob(config_+"/*"))[file_idx]
-            """if (dt_crop):
-                fname = "data/Simulation_Data/"+str(model)+"/Processed_Data/Track_JuMBO/snap_idx.txt"
-                with open(file) as f:
-                    output = csv.reader(f)
-                    for row_ in output:
-                        print(row_)
-                dir = dir_path+"Processed_Data/Final_Binaries_crop/"
-                dir_multi = dir_path+"Processed_Data/Final_MultiSysts_crop/"
-                file_path+fname_+"_snap_idx" \
-                    """
             msys_file = 0
             no_sim_rn += 1
             if "DONE" not in file_name:
-                print("Reading Data: ", file_name)
+                print("Processing Data: ", file_name)
                 syst = 0
                 data = read_set_from_file(file_name, "hdf5")
                 components = data.connected_components(threshold = 
@@ -62,7 +57,7 @@ class ReadData(object):
                         syst += 1
                         multi_syst = 0
 
-                        bin_combo = list(combinations(c, 2)) #All possible binaries in system
+                        bin_combo = list(combinations(c, 2)) #Permuting through connected components
                         keys = [ ]
                         msyst_type = [ ]
                         msyst_keys = [ ]
@@ -82,20 +77,27 @@ class ReadData(object):
                                 eccentric = kepler_elements[3]
                                 if (eccentric<1) and semimajor<0.5*bound_threshold:
                                     no_files += 1
-
                                     multi_syst += 1
-                                    msyst_type = np.concatenate((msyst_type, [bin_sys[0].name , bin_sys[1].name]), axis=None)
+
                                     msyst_keys.append([int(bin_sys[0].key), int(bin_sys[1].key)])
-                                    msyst_mass = np.concatenate((msyst_mass, [bin_sys[0].mass, bin_sys[1].mass]), axis=None)
+                                    msyst_mass = np.concatenate((msyst_mass, 
+                                                        [bin_sys[0].mass, bin_sys[1].mass]), 
+                                                        axis=None)
+                                    msyst_type = np.concatenate((msyst_type, 
+                                                        [bin_sys[0].name , bin_sys[1].name]), 
+                                                        axis=None)
 
                                     keys = [bin_[0].key, bin_[1].key]
                                     bin_type = [bin_[0].name, bin_[1].name]
                                     bin_mass = [bin_[0].mass.value_in(units.MSun), 
                                                 bin_[1].mass.value_in(units.MSun)]
                                     
-                                    proj_xy = np.sqrt((bin_[0].x - bin_[1].x)**2 + (bin_[0].y-bin_[1].y)**2)[0]
-                                    proj_xz = np.sqrt((bin_[0].x - bin_[1].x)**2 + (bin_[0].z-bin_[1].z)**2)[0]
-                                    proj_yz = np.sqrt((bin_[0].y - bin_[1].y)**2 + (bin_[0].z-bin_[1].z)**2)[0]
+                                    proj_xy = np.sqrt((bin_[0].x - bin_[1].x)**2 
+                                                    + (bin_[0].y-bin_[1].y)**2)[0]
+                                    proj_xz = np.sqrt((bin_[0].x - bin_[1].x)**2 
+                                                    + (bin_[0].z-bin_[1].z)**2)[0]
+                                    proj_yz = np.sqrt((bin_[0].y - bin_[1].y)**2 
+                                                    + (bin_[0].z-bin_[1].z)**2)[0]
                                     mproj = (proj_xy+proj_xz+proj_yz)/3
 
                                     inclinate = kepler_elements[4]
@@ -127,24 +129,24 @@ class ReadData(object):
                                     
                             uq_keys, counts = np.unique(all_keys, return_counts=True)
                             uq_keys = uq_keys[counts > 1]
-                            syst_key = [[] for i in range(len(uq_keys))]
                             nhost = [[] for i in range(len(uq_keys))]
+                            syst_key = [[] for i in range(len(uq_keys))]
                             host_keys = [[] for i in range(len(uq_keys))]
 
                             hidx = 0
                             tracked = [ ]
                             for host_ in uq_keys:
                                 if host_ not in tracked:
+                                    nhost[hidx] = 1
                                     tracked = np.concatenate((tracked, host_), axis=None)
                                     syst_key[hidx] = np.concatenate((syst_key[hidx], host_), axis=None)
-                                    nhost[hidx] = 1
                                     host_keys[hidx] = np.concatenate((host_keys[hidx], host_), axis=None)
                                     for sublist_ in msyst_keys:
                                         sublist_ = np.asarray(sublist_)
                                         if host_ in sublist_:
                                             partner = int(sublist_[sublist_ != host_])
                                             syst_key[hidx] = np.concatenate((syst_key[hidx], partner), axis=None)
-                                            if partner in uq_keys: #Does the partner also host multiple systems
+                                            if partner in uq_keys: #Check if partner also host multiple systems
                                                 nhost[hidx] += 1
                                                 host_keys[hidx] = np.concatenate((host_keys[hidx], partner), axis=None)
                                                 for sublist_ in msyst_keys:
@@ -184,80 +186,19 @@ class ReadData(object):
                 if "DONE" not in file_name:
                     os.rename(file_name, file_name+"DONE")
 
-    def detect_neigh(self, model):
-        """Compute number of NN systems"""
-
-        directory = "data/Simulation_Data/"+str(model)+"/"
-        dir_configs = glob.glob(os.path.join(str(directory)+"simulation_snapshot/**"))
-
-        Star_min_mass = 0.08 | units.MSun
-        bound_threshold = 1000 | units.au
-        core_rad = 1.5 | units.pc
-        no_sim_rn = 0
-
-        isol = np.zeros(len(dir_configs))
-        JJ_near = np.zeros(len(dir_configs))
-        JS_near = np.zeros(len(dir_configs))
-        SS_near = np.zeros(len(dir_configs))
-        many_near = [ ]
-        for config_ in dir_configs:
-            print("Reading ", config_)
-            file_name = natsort.natsorted(glob.glob(config_+"/*"))[-1]
-            data = read_set_from_file(file_name, "hdf5")
-            com = data.center_of_mass()
-            for parti_ in data:
-                dx = parti_.x - com.x
-                dy = parti_.y - com.y
-                dz = parti_.z - com.z
-                if np.sqrt(dx**2+dy**2+dz**2) > core_rad:
-                    data -= parti_
-            components = data.connected_components(threshold = 
-                                                    bound_threshold)
-            for c in components:
-                if len(c) == 2:
-                    if max(c.mass) < Star_min_mass:
-                        JJ_near[no_sim_rn] += 1
-                    elif min(c.mass) >= Star_min_mass:
-                        SS_near[no_sim_rn] += 1
-                    else:
-                        JS_near[no_sim_rn] += 1
-                elif len(c) > 2:
-                    temp_arr = [ ]
-                    for name_ in sorted(c.name):
-                        temp_arr.append(name_)
-                    many_near.append(temp_arr)
-                else:
-                    if c.mass < Star_min_mass:
-                        isol[no_sim_rn] += 1
-            no_sim_rn += 1
-
-        with open(os.path.join("plotters/figures/system_evolution/outputs/", 
-                                str(model)+'_flyby.txt'), 'w') as f:
-            for val_, prop_ in zip([isol, JJ_near, SS_near, JS_near], ["Isol J", "JJ", "JS", "SS"]):
-                median = np.median(val_)
-                IQR_low, IQR_high = np.percentile(val_, [25, 75])
-                q1 = median - IQR_low
-                q3 = IQR_high - median
-                lines = ["Raw {} Neigh. ".format(prop_)+str(val_),
-                         "Med. {} Neigh. ".format(prop_)+str(median),
-                         "Q1: "+str(q1)+" Q3: "+str(q3)]
-                for line_ in lines:
-                    f.write(line_+'\n')
-
-            unique_type, type_counts = np.unique(many_near, return_counts=True)
-            red_array = [ ]
-            for type_, count_ in  zip(unique_type, type_counts):
-                red_array.append([type_, count_])
-            for arr_ in red_array:
-                f.write(str(arr_)+"\n")
-
     def proc_time_evol_JuMBO(self, model, JMO_mass):
-        """Process final snapshot and store all detected binaries"""
+        """Process final snapshot and store all detected binaries
+        
+           Input:
+           model:    Model processing data of
+           JMO_mass: Maximum JMO mass
+        """
 
         dir_configs = glob.glob(os.path.join("data/Simulation_Data/"+str(model)+"/simulation_snapshot/**"))
         file_path = "data/Simulation_Data/"+str(model)+"/Processed_Data/Track_JuMBO/"
         file_checker = glob.glob(os.path.join(file_path+"*"))
         if len(file_checker) > 0:
+            print("Data analysis already done for ", model)
             None
         else:
             snap_dt = 102
@@ -268,9 +209,9 @@ class ReadData(object):
                 nsnap = 1002
             else:
                 nsnap = 101
-            semimajor_arr = [[ ] for i in range(nsnap)]
-            eccentric_arr = [[ ] for i in range(nsnap)]
 
+            semi_arr = [[ ] for i in range(nsnap)]
+            ecc_arr = [[ ] for i in range(nsnap)]
             no_JuMBO_all = [ ]
             no_JMO_all = [ ]
             idx_snap = [ ]
@@ -289,7 +230,6 @@ class ReadData(object):
                 data = data[data.mass <= JMO_mass]
                 no_JuMBO[dt] = len(data[data.name == "JuMBOs"])
                 no_JMO[dt] = len(data)
-                components = data.connected_components(threshold = bound_threshold)
                 for snap_ in files:
                     print("File: ", snap_)
                     dt += 1
@@ -333,22 +273,19 @@ class ReadData(object):
                         fiter += 1
                     ecc_dt = np.delete(ecc_dt, del_idx)
                     sem_dt = np.delete(sem_dt, del_idx)
-                    print(dt)
-                    eccentric_arr[dt-1] = np.concatenate((eccentric_arr[dt-1], ecc_dt), axis=None)
-                    semimajor_arr[dt-1] = np.concatenate((semimajor_arr[dt-1], sem_dt), axis=None)
-
+                    
+                    ecc_arr[dt-1] = np.concatenate((ecc_arr[dt-1], ecc_dt), axis=None)
+                    semi_arr[dt-1] = np.concatenate((semi_arr[dt-1], sem_dt), axis=None)
                     for count_ in counts[counts>1]:
                         no_JuMBO[dt] -= (count_-1)
                     no_JuMBO[dt] = min(no_JuMBO[dt], no_JMO[dt])
 
-                    snap_frac_dt = no_JuMBO[dt]/no_JMO[dt]
-                    val1 = abs(0.09 - snap_frac)
-                    val2 = abs(0.09 - snap_frac_dt)
-
+                    dt_frac = no_JuMBO[dt]/no_JMO[dt]
+                    val1 = abs(0.09-snap_frac)
+                    val2 = abs(0.09-dt_frac)
                     if val2 < val1:
                         snap_dt = dt
-                        snap_frac = snap_frac_dt
-
+                        snap_frac = dt_frac
                 no_JMO_all.append(no_JMO)
                 no_JuMBO_all.append(no_JuMBO)
                 idx_snap.append(snap_dt)
@@ -372,7 +309,7 @@ class ReadData(object):
                 data_arr = pd.DataFrame(fdata_)
                 data_arr.to_hdf(os.path.join(file_path+fname_), key ='Data', mode = 'w')
 
-            for data_, fname_ in zip([semimajor_arr, eccentric_arr], ["SemiMajor", "Eccentric"]):
+            for data_, fname_ in zip([semi_arr, ecc_arr], ["SemiMajor", "Eccentric"]):
                 median = [ ]
                 IQR_low = [ ]
                 IQR_high = [ ]
@@ -389,9 +326,12 @@ class ReadData(object):
                 data_arr_IQRL = pd.DataFrame(IQR_low)
                 data_arr_IQRH = pd.DataFrame(IQR_high)
 
-                data_arr_med.to_hdf(os.path.join(file_path+fname_), key ='Data', mode = 'w')
-                data_arr_IQRL.to_hdf(os.path.join(file_path+fname_+"_IQRL"), key ='Data', mode = 'w')
-                data_arr_IQRH.to_hdf(os.path.join(file_path+fname_+"_IQRH"), key ='Data', mode = 'w')
+                data_arr_med.to_hdf(os.path.join(file_path+fname_), 
+                                    key ='Data', mode = 'w')
+                data_arr_IQRL.to_hdf(os.path.join(file_path+fname_+"_IQRL"), 
+                                     key ='Data', mode = 'w')
+                data_arr_IQRH.to_hdf(os.path.join(file_path+fname_+"_IQRH"), 
+                                     key ='Data', mode = 'w')
 
     def proc_time_evol_mixed(self, model, JMO_mass):
         """Process final snapshot and store semi + ecc of detected mixed systems"""
@@ -400,7 +340,7 @@ class ReadData(object):
         file_path = "data/Simulation_Data/"+str(model)+"/Processed_Data/Track_JuMBO/"
         
         bound_threshold = 2000 | units.au
-        semimajor_arr = [ ]
+        semi_arr = [ ]
         ecc_arr = [ ]
         mprim_arr = [ ]
         q_arr = [ ]
@@ -413,8 +353,6 @@ class ReadData(object):
             files = natsort.natsorted(glob.glob(config_+"/*"))
 
             dt = 0
-            data = read_set_from_file(files[0], "hdf5")
-            components = data.connected_components(threshold = bound_threshold)
             for snap_ in files[1:]:
                 dt += 1
                 data = read_set_from_file(snap_, "hdf5")
@@ -435,13 +373,15 @@ class ReadData(object):
                                 semimajor = kepler_elements[2]
                                 eccentric = kepler_elements[3]
                                 if (eccentric<1) and semimajor<(1000 | units.AU):
-                                    semimajor_arr.append(semimajor)
+                                    semi_arr.append(semimajor)
                                     ecc_arr.append(eccentric)
-                                    mprim_arr.append(max(bin_[0].mass, bin_[1].mass))
-                                    q_arr.append(min(bin_[0].mass/bin_[1].mass, bin_[1].mass/bin_[0].mass))
+                                    mprim_arr.append(max(bin_[0].mass, 
+                                                         bin_[1].mass))
+                                    q_arr.append(min(bin_[0].mass/bin_[1].mass, 
+                                                     bin_[1].mass/bin_[0].mass))
                                     file_iter.append(dt)
         
-        data_arr = pd.DataFrame([file_iter, mprim_arr, q_arr, semimajor_arr, ecc_arr])
+        data_arr = pd.DataFrame([file_iter, mprim_arr, q_arr, semi_arr, ecc_arr])
         data_arr.to_hdf(os.path.join(file_path+"mixed_sys_data"), key ='Data', mode = 'w')
 
     def read_init_data(self, directory):
@@ -493,7 +433,7 @@ class ReadData(object):
                         self.init_banom.append(float(data_[13:-8]))
 
     def read_final_data(self, directory, dt_crop):
-        """Read properties of binaries existing at final snapshots"""
+        """Read properties of binaries existing"""
 
         print("...Reading Final Binaries...")
         dir_configs = glob.glob(os.path.join(str(directory)+"Processed_Data/Final_Binaries/*"))
@@ -538,7 +478,7 @@ class ReadData(object):
                     self.jmb_idx.append(len(self.fin_bkeys)-1)
     
     def read_final_multi_data(self, directory, dt_crop):
-        """Read properties of N>2 systems existing at final snapshot"""
+        """Read properties of N>2 systems"""
 
         dir_configs = glob.glob(os.path.join(str(directory)+"Processed_Data/Final_MultiSysts/*"))
         if (dt_crop):

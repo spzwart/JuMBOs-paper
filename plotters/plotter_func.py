@@ -5,6 +5,7 @@ from amuse.units import units
 class PlotterFunctions(object):
     def cdf_plotter(self, data):
         """Sort arrays for CDF plots
+
            Inputs:
            data:   The data array
            unit:   Boolean denoting if input has units
@@ -27,6 +28,7 @@ class PlotterFunctions(object):
     def multi_sys_flag(self, key_array, mass_array, type_array):
         """Function grouping together all multi-systems from their
            permutation combinations (i.e [1,2], [1,3] --> [1,2,3])
+           
            Inputs:
            key_array:   Array hosting particle keys
            mass_array:  Array hosting system masses

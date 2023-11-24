@@ -39,12 +39,10 @@ labels = ["Star", "FF", "Star-Star", "Star-Jup.", r"$N\geq 3$", "JuMBO"]
 xObs = [ ]
 yObs = [ ]
 for ra_, dec_ in zip(or_stars["ra"], or_stars["dec"]):
-    print(ra_, dec_)
     coord = SkyCoord(ra=ra_, dec=dec_, unit=(u.deg, u.deg), 
                      distance = 390*u.pc)
     xObs.append(coord.cartesian.x.value)
     yObs.append(coord.cartesian.y.value)
-    
 center = SkyCoord(ra="83.8", dec="-5 23 14.45", 
                   unit=(u.deg, u.deg), distance = 390*u.pc)
 
@@ -90,6 +88,7 @@ parti_data.move_to_center()
 parti_data.name = "star"
 parti_data[parti_data.mass <= JuMBO_max_mass].name = "FF"
 components = parti_data.connected_components(threshold = bound_threshold)
+
 q_jmb = [ ]
 for c in components:
     if len(c) > 1:
@@ -100,11 +99,11 @@ for c in components:
             bin_sys = Particles()  
             bin_sys.add_particle(bin_[0])
             bin_sys.add_particle(bin_[1])
-
             kepler_elements = orbital_elements_from_binary(bin_sys, G=constants.G)
             semimajor = kepler_elements[2]
             eccentric = kepler_elements[3]
-            if (eccentric < 1) and semimajor < 0.5*bound_threshold:
+
+            if (eccentric < 1) and (semimajor < 0.5*bound_threshold):
                 multi_syst += 1
                 if max(bin_[0].mass, bin_[1].mass) <= JuMBO_max_mass:
                     q = min(bin_[1].mass/bin_[0].mass, bin_[0].mass/bin_[1].mass)
@@ -116,8 +115,8 @@ for c in components:
                     parti_data[parti_data.key == bin_[0].key].name = "Star-Star"
                     parti_data[parti_data.key == bin_[1].key].name = "Star-Star"
                 else:
-                    parti_data[parti_data.key == bin_[0].key].name = "Star-Jupiter"
-                    parti_data[parti_data.key == bin_[1].key].name == "Star-Jupiter"
+                    parti_data[parti_data.key == bin_[0].key].name = "Star-JMO"
+                    parti_data[parti_data.key == bin_[1].key].name == "Star-JMO"
             keys = np.concatenate((keys, [bin_[0].key, bin_[1].key]), axis = None)
 
         if multi_syst > 1:

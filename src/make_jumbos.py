@@ -1,11 +1,9 @@
 import numpy as np
 import os
-from numpy import random
 
-from amuse.lab import units, Particles, new_salpeter_mass_distribution, constants, read_set_from_file
+from amuse.lab import units, Particles, new_salpeter_mass_distribution, constants
 from amuse.ext.orbital_elements import generate_binaries
 from amuse.ext.orbital_elements import orbital_elements_from_binary
-from amuse.ic import make_planets_oligarch
 
 from src.data_process import DataProcess
 
@@ -16,6 +14,7 @@ def new_rotation_matrix_from_euler_angles(phi, theta, chi):
     sint=np.sin(theta)
     cosc=np.cos(chi)
     sinc=np.sin(chi)
+
     #see wikipedia: http://en.wikipedia.org/wiki/Rotation_matrix
     return np.array(
         [[cost*cosc, -cosp*sinc + sinp*sint*cosc, sinp*sinc + cosp*sint*cosc], 
@@ -37,20 +36,22 @@ def make_isolated_jumbos(bodies, config, data_direc):
     JuMBOs = bodies[bodies.name=="JuMBOs"]
     njumbos = len(JuMBOs)
     
-    q = np.sqrt(np.random.uniform(np.sqrt((13.75)**-1), 1, njumbos))
-    mvals = new_salpeter_mass_distribution(njumbos, 0.0006 | units.MSun,
-                                           0.013 | units.MSun, alpha = -1.2)
+    JMO_minm = 0.0006 | units.MSun
+    JMO_maxm = 0.013 | units.MSun
+    q_min = (13.75)**-1
+    q = np.sqrt(np.random.uniform(np.sqrt(q_min), 1, njumbos))
+    mvals = new_salpeter_mass_distribution(njumbos, JMO_minm, JMO_maxm, alpha = -1.2)
     JuMBOs.mass = mvals
     mprim = JuMBOs.mass
     msec = JuMBOs.mass*q
 
-    Nunder = len(msec[msec < (0.0006 | units.MSun)])
-    mvals = np.random.uniform(0.0006, 0.013, Nunder) 
-    msec[msec < (0.0006 | units.MSun)] = mvals * (1 | units.MSun)
+    Nunder = len(msec[msec < (JMO_minm)])
+    mvals = np.random.uniform(JMO_minm, JMO_maxm, Nunder) 
+    msec[msec < JMO_minm] = mvals * (1 | units.MSun)
     
     sma = np.random.uniform(25, 400, njumbos) | units.au
     ecc = np.sqrt(np.random.uniform(0, np.sqrt(0.9), njumbos))
-    inc = np.arccos(1-2*np.random.uniform(0,1, njumbos)) | units.rad
+    inc = np.arccos(1-2*np.random.uniform(0, 1, njumbos)) | units.rad
     loan = np.random.uniform(0, 2*np.pi, njumbos) | units.rad
     aop = np.random.uniform(0, 2*np.pi, njumbos) | units.rad
     true_anomaly = np.random.uniform(0, 2*np.pi, njumbos)
@@ -89,15 +90,16 @@ def make_isolated_jumbos(bodies, config, data_direc):
         asc_node = kepler_elements[6]
         true_anm = kepler_elements[7]
 
-        lines = ["Key1: {}".format(prim_.key), "Key2: {}".format(second_.key),
-                 "M1: {} ".format(prim_.mass.in_(units.MSun)), 
-                 "M2: {} ".format(second_.mass.in_(units.MSun)),
+        lines = ["Key1: {}".format(prim_.key), 
+                 "Key2: {}".format(second_.key),
+                 "M1: {}".format(prim_.mass.in_(units.MSun)), 
+                 "M2: {}".format(second_.mass.in_(units.MSun)),
                  "Semi-major axis: {}".format(abs(sem).in_(units.au)),
                  "Eccentricity: {}".format(ecc),
                  "Inclination: {} deg".format(inc),
-                 "Argument of Periapsis: {} degrees".format(arg_peri),
-                 "Longitude of Asc. Node: {} degrees".format(asc_node),
-                 "True Anomaly: {} degrees".format(true_anm),
+                 "Argument of Periapsis: {} deg".format(arg_peri),
+                 "Longitude of Asc. Node: {} deg".format(asc_node),
+                 "True Anomaly: {} deg".format(true_anm),
                  "================================================================="]
         
         with open(os.path.join(data_manip.path+str('initial_binaries'),
