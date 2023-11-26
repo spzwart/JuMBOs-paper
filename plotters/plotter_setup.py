@@ -34,48 +34,52 @@ class PlotterSetup(object):
 
     def model_layout(self, model_choices):
         if model_choices == [0,1,2]:
-            labels = [r"F05", r"F05FF", r"F1"]
+            labels = [r"Fr_050", r"Fr_050ff", r"Fr_100"]
             plot_label = r"Fractal"
             extra_str = "Fractal_General_"
             
         elif model_choices == [0,3]:
-            labels = [r"F05", r"P05"]
+            labels = [r"Fr_050", r"Pl_050"]
             plot_label = r"$R_{\mathrm{vir}} = 0.5$ pc"
             extra_str = "Distr_0.5_noFF_"
 
         elif model_choices == [1,10]:
-            labels = [r"F05FF", r"F05FFO"]
+            labels = [r"Fr_050ff", r"Fr_050ffO"]
             plot_label = r"$R_{\mathrm{vir}} = 0.5$ pc"
             extra_str = "Frac_FF_GenObs_"
 
         elif model_choices == [3,4,5]:
-            labels = [r"P05", r"P05FF", r"P1"]
+            labels = [r"Pl_050", r"Pl_050ff", r"Pl_100"]
             plot_label = r"Plummer"
             extra_str = "Plummer_General_"
 
         elif model_choices == [0,6]:
-            labels = [r"F05", r"F05FFL"]
+            labels = [r"Fr_050", r"Fr_050ffL"]
             plot_label = r"Fractal, $R_{\mathrm{vir}} = 0.5$ pc, w/FF"
             extra_str = "SimTime_"
 
         elif model_choices == [1,7,10]:
-            labels = [r"F05FF", r"F05_FFC",
-                      r"F05FFO"]
+            labels = [r"Fr_050ff", r"Fr_050OC",
+                      r"Fr_050ffO"]
             plot_label = r"Fractal, $R_{\mathrm{vir}} = 0.5$ pc, w/FF"
             extra_str = "Fractal_FF_"
 
         elif model_choices == [1,7]:
-            labels = [r"F05FF", r"F05_FFC"]
+            labels = [r"Fr_050ff", r"Fr_050OC"]
             plot_label = r"Fractal, $R_{\mathrm{vir}} = 0.5$ pc, w/FF"
             extra_str = "Fractal_FFvsJFF_"
 
         elif model_choices == [1,4,10,11]:
-            labels = [r"F05FF", r"P05FF",
-                      r"F05FFO", r"P05FFO"]
+            labels = [r"Fr_050ff", r"Pl_050ff",
+                      r"Fr_050ffO", r"Pl_050ffO"]
             plot_label = r"Fractal, $R_{\mathrm{vir}} = 0.5$ pc, w/FF"
             extra_str = "Distr_FF_GenObs_"
+        elif model_choices == [0,8,9]:
+            labels = [r"Fr_050", r"Fr_050O", r"Fr_050OC"]
+            plot_label = r"Fractal, $R_{\mathrm{vir}} = 0.5$ pc, w/FF"
+            extra_str = "Fractal_GenObs_"
         else:
-            labels = [r"F05FFL"]
+            labels = [r"Fr_050ffL"]
             plot_label = r"Fractal, $R_{\mathrm{vir}} = 0.5$ pc, w/FF, 10 Myr"
             extra_str = "Frac_FF_10Myr"
         return labels, plot_label, extra_str

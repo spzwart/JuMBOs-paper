@@ -14,6 +14,7 @@ from amuse.ext.orbital_elements import orbital_elements_from_binary
 from amuse.io.base import read_set_from_file
 from amuse.units import units, constants
 
+from read_data import ReadData
 from plotter_setup import PlotterSetup
 
 class SystemAnimations(object):
@@ -114,8 +115,8 @@ class SystemAnimations(object):
                 ax.xaxis.set_major_formatter(FormatStrFormatter('%.1f'))
                 ax.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
                 self.clean_plot.tickers(ax, "plot")
-                ax.set_xlabel(r"$x$ [pc]", fontsize = self.clean_plot.axlabel_size)
-                ax.set_ylabel(r"$y$ [pc]", fontsize = self.clean_plot.axlabel_size)
+                ax.set_xlabel(r"$x$ [pc]", fontsize=self.clean_plot.axlabel_size)
+                ax.set_ylabel(r"$y$ [pc]", fontsize=self.clean_plot.axlabel_size)
                 fig.savefig(fname, dpi=300, bbox_inches='tight')
                 plt.close(fig)
 
@@ -320,7 +321,6 @@ class SystemAnimations(object):
         def be_calc(m1,m2,a):
             return -(constants.G*m1*m2)/(2*abs(a))
 
-                
         path = "data/Simulation_Data/"+str(model)
         output_file = "plotters/figures/system_evolution/movie_JuMBOs"+str(model)+".mp4"
         init_snap =  natsort.natsorted(glob.glob(os.path.join(str(path+"/simulation_snapshot/")+"*")))
@@ -333,8 +333,9 @@ class SystemAnimations(object):
         parti_data = parti_data[parti_data.mass <= self.JuMBO_max_mass]
         components = parti_data.connected_components(threshold = self.bound_threshold)
         no_det = 0
+        semimajor = 0 | units.au
         for c in components:
-            if len(c) > 1 and no_det < 5:
+            if len(c) > 1 and semimajor <= 80 | units.au:
                 bin_combo = list(combinations(c, 2))
                 for bin_ in bin_combo:
                     bin_sys = Particles()  
@@ -344,6 +345,7 @@ class SystemAnimations(object):
                     kepler_elements = orbital_elements_from_binary(bin_sys, G=constants.G)
                     semimajor = kepler_elements[2]
                     eccentric = kepler_elements[3]
+                    print(semimajor.value_in(units.au))
                     if (eccentric < 1) and semimajor < self.bound_threshold:
                         bin_keys = [bin_[0].key, bin_[1].key]
                         no_det += 1
@@ -409,45 +411,45 @@ class SystemAnimations(object):
                                      edgecolor = "black", norm = normalise, 
                                      linewidth = 0.1, c = BE_arr[snap_]/max_BE)
             cbar = plt.colorbar(colour_axes, ax=ax)
-            cbar.set_label(label = r'$B_E/B_{E,\ \mathrm{max}}$', fontsize = self.clean_plot.axlabel_size)
+            cbar.set_label(label = r'$B_E/B_{E,\ \mathrm{max}}$', fontsize=self.clean_plot.axlabel_size)
             ax.scatter(starx[0], stary[0], s=100*(stars[0].mass/parti_data.mass.max())**0.25, 
                        label = "Star", edgecolor = "black", linewidth = 0.1, color = "gold")
             ax.scatter(starx[1:], stary[1:], s=100*(stars[1:].mass/parti_data.mass.max())**0.25, 
                        edgecolor = "black", linewidth = 0.1, color = "gold")
             ax.scatter(jmbx[0], jmby[0], s=200*(jmb[0].mass/parti_data.mass.max())**0.25, 
-                       label = "JuMBO", edgecolor = "black", linewidth = 0.1, color = "brown")
+                       label = "JuMBO", edgecolor = "black", linewidth = 0.1, color = "blue")
             ax.scatter(jmbx[1:], jmby[1:], s=200*(jmb[1:].mass/parti_data.mass.max())**0.25, 
-                       edgecolor = "black", linewidth = 0.1, color = "brown")
+                       edgecolor = "black", linewidth = 0.1, color = "blue")
             if len(FFx) > 0:
                 ax.scatter(FFx[0], FFy[0], s=200*(FF[0].mass/parti_data.mass.max())**0.25, label = "FF", 
-                            edgecolor = "black", linewidth = 0.1, color = "cyan")
+                            edgecolor = "black", linewidth = 0.1, color = "red")
                 ax.scatter(FFx[1:], FFy[1:], s=200*(FF[1:].mass/parti_data.mass.max())**0.25, 
-                           edgecolor = "black", linewidth = 0.1, color = "cyan")
+                           edgecolor = "black", linewidth = 0.1, color = "red")
             ax.text(self.clean_plot.right, self.clean_plot.top, 
                     self.leg_label, 
                     horizontalalignment='right',
                     verticalalignment='bottom',
-                    fontsize = self.clean_plot.axlabel_size,
+                    fontsize=self.clean_plot.axlabel_size,
                     transform=ax.transAxes)
             if "10Myr" in model:
                 ax.text(self.clean_plot.right, self.clean_plot.top, 
                         r"$t = {:.1f}$ Myr".format(float(snap_*dt)/100),
                         horizontalalignment='right',
                         verticalalignment='top',
-                        fontsize = self.clean_plot.axlabel_size,
+                        fontsize=self.clean_plot.axlabel_size,
                         transform=ax.transAxes)
             else:
                 ax.text(self.clean_plot.right, self.clean_plot.top, 
                         r"$t = {:.1f}$ kyr".format(float(snap_*dt)),
                         horizontalalignment='right',
                         verticalalignment='top',
-                        fontsize = self.clean_plot.axlabel_size,
+                        fontsize=self.clean_plot.axlabel_size,
                         transform=ax.transAxes)
             ax.set_xlim(-400,400)#(-1300, 1300)
             ax.set_ylim(-400,400)#(-1300, 1300)
             self.clean_plot.tickers(ax, "plot")
-            ax.set_xlabel(r"$x$ [au]", fontsize = self.clean_plot.axlabel_size)
-            ax.set_ylabel(r"$y$ [au]", fontsize = self.clean_plot.axlabel_size)
+            ax.set_xlabel(r"$x$ [au]", fontsize=self.clean_plot.axlabel_size)
+            ax.set_ylabel(r"$y$ [au]", fontsize=self.clean_plot.axlabel_size)
             ax.legend(prop={'size': self.clean_plot.axlabel_size}, loc=3)
             fig.savefig(self.image_dir+"/system_JuMBO_"+str(snap_)+".png", dpi=300, bbox_inches='tight')
             snap_ += 1
@@ -463,16 +465,17 @@ class SystemAnimations(object):
             os.remove(f)
 
     def mix_sem_ecc(self):
-        models = ["Fractal_rvir0.5", "Fractal_rvir0.5_FF", "Fractal_rvir1.0",
-                  "Plummer_rvir0.5", "Plummer_rvir0.5_FF", "Plummer_rvir1.0",
-                  "Fractal_rvir0.5_FF_10Myr", "Fractal_rvir0.5_Obs", 
-                  "Fractal_rvir0.5_Obs_Circ",  "Fractal_rvir0.5_FF_Obs", 
-                  "Plummer_rvir0.5_FF_Obs"]
+        models = ["Fractal_rvir0.5", "Fractal_rvir0.5_FF",
+                  "Plummer_rvir0.5", "Plummer_rvir0.5_FF"]
 
         mass_img = "plotters/figures/system_evolution/mass_fluctuate/"
         orb_img = "plotters/figures/system_evolution/sem_ecc_fluctuate/"
 
         for model_ in models:
+            path = "data/Simulation_Data/"+str(model_)
+            traj_files = glob.glob(os.path.join(str(path+"/simulation_snapshot/")+"*"))
+            NSims = len(traj_files)
+
             fname = "data/Simulation_Data/"+model_+"/Processed_Data/Track_JuMBO/mixed_sys_data"
             events = pd.read_hdf(fname, 'Data')
             mass_fname = "plotters/figures/system_evolution/"+model_+"mass_evol.mp4"
@@ -489,18 +492,23 @@ class SystemAnimations(object):
                 q_arr.append(np.log10(events.iloc[2][col_]))
                 semi_arr.append(events.iloc[3][col_].value_in(units.au))
                 ecc_arr.append(events.iloc[4][col_])
+
             mprim_arr = np.asarray(mprim_arr)
             q_arr = np.asarray(q_arr)
             semi_arr = np.asarray(semi_arr)
             ecc_arr = np.asarray(ecc_arr)
 
-            uq_runs = np.unique(sim_run)
+            uq_runs, Nsysts = np.unique(sim_run, return_counts=True)
+            
             dt = 0
-            for run_ in uq_runs:
+            for run_, Nsyst in zip(uq_runs, Nsysts):
                 mprim_vals = mprim_arr[sim_run == run_]
                 q_vals = q_arr[sim_run == run_]
                 semi_vals = semi_arr[sim_run == run_]
                 ecc_vals = ecc_arr[sim_run == run_]
+                
+                mprim_vals = mprim_vals[np.isfinite(q_vals)]
+                q_vals = q_vals[np.isfinite(q_vals)]
 
                 values = np.vstack([mprim_vals, q_vals])
                 xx, yy = np.mgrid[0:10:200j, -4:0:200j]
@@ -512,16 +520,22 @@ class SystemAnimations(object):
                 cfset = ax.contourf(xx, yy, f, cmap="Blues", levels = 7, zorder = 1)
                 cset = ax.contour(xx, yy, f, colors = "k", levels = 7, zorder = 2)
                 ax.clabel(cset, inline=1, fontsize=10)
-                ax.set_xlabel(r"$M_{\mathrm{prim}}$", fontsize = self.clean_plot.axlabel_size)
-                ax.set_ylabel(r"$\log_{10}q$", fontsize = self.clean_plot.axlabel_size)
+                ax.set_xlabel(r"$M_{\mathrm{prim}} [M_{\mathrm{\odot}}]$", fontsize=self.clean_plot.axlabel_size)
+                ax.set_ylabel(r"$\log_{10}q$", fontsize=self.clean_plot.axlabel_size)
                 ax.set_xlim(0,10)
                 ax.set_ylim(-4,0)
                 self.clean_plot.tickers(ax, "hist")
-                ax.text(self.clean_plot.right, self.clean_plot.top, 
+                ax.text(self.clean_plot.right, self.clean_plot.top-1, 
+                        r"$\langle N_{{\mathrm{{systs}}}}\rangle = {:.1f}$".format(float(Nsyst/NSims)),
+                        horizontalalignment='right',
+                        verticalalignment='top',
+                        fontsize=self.clean_plot.axlabel_size,
+                        transform=ax.transAxes)
+                ax.text(self.clean_plot.right, self.clean_plot.top-0.95, 
                         r"$t = {:.1f}$ kyr".format(float(dt*10)),
                         horizontalalignment='right',
                         verticalalignment='top',
-                        fontsize = self.clean_plot.axlabel_size,
+                        fontsize=self.clean_plot.axlabel_size,
                         transform=ax.transAxes)
                 fig.savefig(mass_img+"system_"+str(dt)+".png", dpi=300, bbox_inches='tight')
                 plt.close()
@@ -536,16 +550,22 @@ class SystemAnimations(object):
                 cfset = ax.contourf(xx, yy, f, cmap="Blues", levels = 7, zorder = 1)
                 cset = ax.contour(xx, yy, f, colors = "k", levels = 7, zorder = 2)
                 ax.clabel(cset, inline=1, fontsize=10)
-                ax.set_xlabel(r"$a$ [au]", fontsize = self.clean_plot.axlabel_size)
-                ax.set_ylabel(r"$e$", fontsize = self.clean_plot.axlabel_size)
+                ax.set_xlabel(r"$a$ [au]", fontsize=self.clean_plot.axlabel_size)
+                ax.set_ylabel(r"$e$", fontsize=self.clean_plot.axlabel_size)
                 ax.set_xlim(0,1000)
                 ax.set_ylim(0,1)
                 self.clean_plot.tickers(ax, "hist")
-                ax.text(self.clean_plot.right, self.clean_plot.top, 
+                ax.text(self.clean_plot.right, self.clean_plot.top-1, 
+                        r"$\langle N_{{\mathrm{{systs}}}}\rangle = {:.1f}$".format(float(Nsyst/NSims)),
+                        horizontalalignment='right',
+                        verticalalignment='top',
+                        fontsize=self.clean_plot.axlabel_size,
+                        transform=ax.transAxes)
+                ax.text(self.clean_plot.right, self.clean_plot.top-0.95, 
                         r"$t = {:.1f}$ kyr".format(float(dt*10)),
                         horizontalalignment='right',
                         verticalalignment='top',
-                        fontsize = self.clean_plot.axlabel_size,
+                        fontsize=self.clean_plot.axlabel_size,
                         transform=ax.transAxes)
                 fig.savefig(orb_img+"system_"+str(dt)+".png", dpi=300, bbox_inches='tight')
                 plt.close()
@@ -590,7 +610,10 @@ def sim_checker():
             prev_key = parti_data.key[0]
             print(Q, Rvir)
 
+
+
 animate = SystemAnimations()
 #animate.config_init_final()
+#animate.mix_sem_ecc()
 animate.JuMBO_evolution(animate.models[1])
 animate.system_evolution()

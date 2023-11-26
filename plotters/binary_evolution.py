@@ -848,9 +848,9 @@ class FinalInitialProperties(object):
             mprim_sim.append(max(bin_[0], bin_[1]))
 
         fig, ax = plt.subplots()
-        ax.hist2d(np.log10(fin_jmb_mprim), fin_jmb_semi, bins=100, 
-                  range=([-0.5,1.8],[0,1000]), cmap='viridis')
-        colour_axes = ax.scatter(np.log10(mprim_obs), proj_sep, 
+        #ax.hist2d((fin_jmb_mprim), fin_jmb_semi, bins=100, 
+        #          range=([0.8,14],[0,1000]), cmap='viridis')
+        colour_axes = ax.scatter((mprim_obs), proj_sep, 
                                  label="Observation", c=q_obs, 
                                  edgecolors="black")
         cbar = plt.colorbar(colour_axes, ax=ax)
@@ -858,7 +858,9 @@ class FinalInitialProperties(object):
         ax.set_xlabel(r'$M_{\mathrm{prim}}\ [ \mathrm{M}_{\mathrm{Jup}} ]$', 
                       fontsize=self.clean_plot.axlabel_size)
         ax.set_ylabel(r'$r_{ij}$ [au]', fontsize=self.clean_plot.axlabel_size)
-        ax.legend(prop={'size': self.clean_plot.axlabel_size})
+        self.clean_plot.tickers(ax, "plot")
+        ax.set_xlim(0,15)
+        ax.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
         plt.savefig(fname, dpi=300, bbox_inches='tight')
         plt.clf()
 
@@ -903,6 +905,13 @@ class FinalInitialProperties(object):
             citer += 1
 
         for plot_ in range(len(file_name)):
+            if file_name[plot_] == "eccentricity":
+                xlim = [0,1]
+            elif file_name[plot_] == "proj_sep":
+                xlim = [0,1700]
+            elif file_name[plot_] == "sem_axis":
+                xlim = [0,1000]
+            
             direc = "plotters/figures/binary_evolution/"
             if len(model_choices) > 2:
                 mcomp = 2
@@ -919,7 +928,7 @@ class FinalInitialProperties(object):
                         +'_'+self.models[model_choices[mcomp]]+'.txt'
 
             fig, ax = plt.subplots()  
-            ax.set_ylim(0,1)
+            ax.set_ylim(0,1.04)
             ax.set_xlabel(xlabel[plot_], fontsize=self.clean_plot.axlabel_size)
             ax.set_ylabel(ylabel[plot_], fontsize=self.clean_plot.axlabel_size)
             if file_name[plot_] == "sem_axis":
@@ -994,7 +1003,7 @@ class FinalInitialProperties(object):
                     if model_choices[k_] == 0:
                         ax.plot(isort, ipop, color="black", 
                                 label="Initial", zorder=1)
-                    elif model_choices[k_] == 4:
+                    elif model_choices[k_] == 3:
                         ax.plot(isort, ipop, color="black", 
                                 label="Initial", zorder=1)
                     elif model_choices[k_] == 8:
@@ -1014,7 +1023,9 @@ class FinalInitialProperties(object):
                 nsamp[k_].append(nsamples)
                 ncrop[k_].append(nsamples_cropped)
             self.clean_plot.tickers(ax, "plot")
-            ax.legend(prop={'size': self.clean_plot.axlabel_size})
+            ax.legend(prop={'size': self.clean_plot.axlabel_size}, loc=4)
+            ax.set_xlim(xlim[0], xlim[1])
+            ax.set_ylim(0, 1.04)
             fig.savefig(fname, dpi=300, bbox_inches='tight')
             plt.close()
 
@@ -1115,7 +1126,8 @@ class FinalInitialProperties(object):
         ax.set_ylabel(r"$\log_{10}(\langle N_{\mathrm{JuMBO}}\rangle/\langle N_{\mathrm{JMO}}\rangle)$", fontsize=self.clean_plot.axlabel_size)
         ax.set_ylim(1.05*miny, 0)
         self.clean_plot.tickers(ax, "plot")
-        ax.legend(prop={'size': self.clean_plot.axlabel_size})
+        plt.locator_params(axis='x', nbins=4)
+        ax.legend(prop={'size': self.clean_plot.axlabel_size}, loc=3)
         plt.savefig("plotters/figures/system_evolution/"+str(extra_str)+"fJuMBO_evol.pdf", dpi=700, bbox_inches='tight')
         fig.clear()
 
@@ -1129,6 +1141,7 @@ class FinalInitialProperties(object):
             IQR_low = pd.read_hdf(file_path+"SemiMajor_IQRL", 'Data')
             IQR_high = pd.read_hdf(file_path+"SemiMajor_IQRH", 'Data')
             time = np.linspace(0, 1, len(med_val))
+            time2 = time
             if model_choices != [3,4,5]:
                 time = np.log10(time)
             if model_choices == [6]:
@@ -1146,7 +1159,7 @@ class FinalInitialProperties(object):
                 frac_dt = -1
             ax.scatter(time[frac_dt], med_val.iloc[frac_dt], color=self.colours[fiter], zorder=5)
             with open(os.path.join("plotters/figures/system_evolution/outputs/"+self.models[model_iter]+'_evol.txt'), 'w') as f:
-                f.write(r"t = {:.1f} kyr, a = {:.1f}, IQR [{:.1f}, {:.1f}]".format(time[frac_dt+1], 
+                f.write(r"t = {:.5f} kyr, a = {:.1f}, IQR [{:.1f}, {:.1f}]".format(time2[frac_dt+1], 
                         med_val.iloc[frac_dt,0], IQR_low.iloc[frac_dt,0], 
                         IQR_high.iloc[frac_dt,0]))
             fiter += 1
@@ -1163,99 +1176,110 @@ class FinalInitialProperties(object):
         ax.set_ylabel(r"$a$ [au]", fontsize=self.clean_plot.axlabel_size)
         self.clean_plot.tickers(ax, "plot")
         ax.legend(prop={'size': self.clean_plot.axlabel_size})
+        ax.xaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+        plt.locator_params(axis='x', nbins=4)
         plt.savefig("plotters/figures/system_evolution/"+str(extra_str)+"sem_evol.pdf", dpi=700, bbox_inches='tight')
         fig.clear()
 
-    def two_point_correlation(self, model_iter, dt_crop):
+    def two_point_correlation(self, model_choices, dt_crop):
         """Function plotting the two-point correlation function
            Input:
            model_iter: The model wishing to analyse
            dt_crop:    Boolean to investigate final snapshot, or when fJuMBO = 9%
         """
-        
-        directory = "data/Simulation_Data/"+str(self.models[model_iter])+"/"
-        dir_configs = glob.glob(os.path.join(str(directory)+"simulation_snapshot/**"))
-        if (dt_crop):
-            file = os.path.join("plotters/figures/system_evolution/outputs/"+str(self.models[model_iter])+"_evol.txt")
-            with open(file) as f:
-                output = csv.reader(f)
-                for row_ in output:
-                    time = float(row_[0][4:-3])
-                    file_idx = int(np.floor(time/10))
-            fname = "plotters/figures/system_evolution/two_point_corr"+str(self.models[model_iter])+"_crop_jmo.pdf"
-        else:
-            file_idx = -1
-            fname = "plotters/figures/system_evolution/two_point_corr"+str(self.models[model_iter])+"_jmo.pdf"
 
-        jmo_jmo_arr = [ ]
-        #jmb_jmo_arr = [ ]
-        #jmb_jmb_arr = [ ]
-        str_str_arr = [ ]
-        #str_jmb_arr = [ ]
-        str_jmo_arr = [ ]
+        leg_txt, plot_label, extra_str = self.clean_plot.model_layout(model_choices)
+        miter = 0
+        lstyle = ["-", "-."]
 
-        citer = 1
-        file_no = 0
-        for config_ in dir_configs:
-            file_no += 1
-            print("Reading file #", file_no)
+        fig, ax = plt.subplots()
+        ax.set_xlabel(r"$\log_{10} \zeta(r_i,r_j)}$ [au]", fontsize=self.clean_plot.axlabel_size)
+        ax.set_ylabel(r"$\log_{10} f_{<\zeta(r_i,r_j)}$", fontsize=self.clean_plot.axlabel_size)
+        for model_iter in model_choices:
+            directory = "data/Simulation_Data/"+str(self.models[model_iter])+"/"
+            dir_configs = glob.glob(os.path.join(str(directory)+"simulation_snapshot/**"))
+            if (dt_crop):
+                file = os.path.join("plotters/figures/system_evolution/outputs/"+str(self.models[model_iter])+"_evol.txt")
+                with open(file) as f:
+                    output = csv.reader(f)
+                    for row_ in output:
+                        time = float(row_[0][4:-3])
+                        file_idx = int(np.floor(time/10))
+                fname = "plotters/figures/system_evolution/two_point_corr"+str(self.models[model_iter])+"_crop_jmo.pdf"
+            else:
+                file_idx = -1
+                fname = "plotters/figures/system_evolution/two_point_corr"+str(self.models[model_iter])+"_jmo.pdf"
 
-            sim_snapshot = natsort.natsorted(glob.glob(os.path.join(config_+"/*")))[file_idx]
-            data = read_set_from_file(sim_snapshot, "hdf5")
-            star = data[data.mass >= self.Star_min_mass]
-            FF = data[data.mass < self.Star_min_mass]
-            
-            str_str = [ ]
-            str_jmo = [ ]
-            pset = [data, FF]
-            str_dist_arr = [str_str, str_jmo]
-            for star_ in star:
-                pset[0] = star - star_
-                for type_, darr_ in zip(pset, str_dist_arr):
-                    if len(type_) > 0:
-                        dx = type_.x - star_.x
-                        dy = type_.y - star_.y
-                        dz = type_.z - star_.z
-                        dist = np.sqrt(dx**2+dy**2+dz**2)
-                        darr_.append(min(dist).value_in(units.au))
-            
-            jmo_jmo = [ ]
-            for jmo_ in FF:
-                pset = FF - jmo_
-                dx = jmo_.x - pset.x
-                dy = jmo_.y - pset.y
-                dz = jmo_.z - pset.z
-                dist = np.sqrt(dx**2+dy**2+dz**2)
-                if len(dist) >0:
-                    jmo_jmo.append(min(dist).value_in(units.au))
+            jmo_jmo_arr = [ ]
+            #jmb_jmo_arr = [ ]
+            #jmb_jmb_arr = [ ]
+            str_str_arr = [ ]
+            #str_jmb_arr = [ ]
+            str_jmo_arr = [ ]
 
-            jmo_jmo_arr = np.concatenate((jmo_jmo_arr, jmo_jmo), axis=None)
-            str_str_arr = np.concatenate((str_str_arr, str_str), axis=None)
-            str_jmo_arr = np.concatenate((str_jmo_arr, str_jmo), axis=None)
+            citer = 1
+            file_no = 0
+            for config_ in dir_configs:
+                file_no += 1
+                print("Reading file #", file_no)
 
-            citer += 1
+                sim_snapshot = natsort.natsorted(glob.glob(os.path.join(config_+"/*")))[file_idx]
+                data = read_set_from_file(sim_snapshot, "hdf5")
+                star = data[data.mass >= self.Star_min_mass]
+                FF = data[data.mass < self.Star_min_mass]
+                
+                str_str = [ ]
+                str_jmo = [ ]
+                pset = [data, FF]
+                str_dist_arr = [str_str, str_jmo]
+                for star_ in star:
+                    pset[0] = star - star_
+                    for type_, darr_ in zip(pset, str_dist_arr):
+                        if len(type_) > 0:
+                            dx = type_.x - star_.x
+                            dy = type_.y - star_.y
+                            dz = type_.z - star_.z
+                            dist = np.sqrt(dx**2+dy**2+dz**2)
+                            darr_.append(min(dist).value_in(units.au))
+                
+                jmo_jmo = [ ]
+                for jmo_ in FF:
+                    pset = FF - jmo_
+                    dx = jmo_.x - pset.x
+                    dy = jmo_.y - pset.y
+                    dz = jmo_.z - pset.z
+                    dist = np.sqrt(dx**2+dy**2+dz**2)
+                    if len(dist) >0:
+                        jmo_jmo.append(min(dist).value_in(units.au))
 
-        data_arr = [str_str_arr, str_jmo_arr, jmo_jmo_arr]
-        label_arr = ["Star-Star", "Star-JMO", "JMO-JMO"]
-        colours_arr = ["Black", "Red", "Blue"]
+                jmo_jmo_arr = np.concatenate((jmo_jmo_arr, jmo_jmo), axis=None)
+                str_str_arr = np.concatenate((str_str_arr, str_str), axis=None)
+                str_jmo_arr = np.concatenate((str_jmo_arr, str_jmo), axis=None)
 
-        with open(os.path.join("plotters/figures/system_evolution/two_point_corr"+str(self.models[model_iter])+"_jmo.txt"), 'w') as f: 
-            f.write("Data for "+str(self.models[model_iter]))
+                citer += 1
 
-            fig, ax = plt.subplots()
-            ax.set_xlabel(r"$\log_{10} \zeta(r_i,r_j)}$ [au]", fontsize=self.clean_plot.axlabel_size)
-            ax.set_ylabel(r"$\log_{10} f_{<\zeta(r_i,r_j)}$", fontsize=self.clean_plot.axlabel_size)
-            for data_, label_, colour_ in zip(data_arr, label_arr, colours_arr):
-                dsort = np.sort(data_)
-                diter = np.asarray([i for i in enumerate(dsort)])
-                diter = diter[:,0]
-                diter /= max(diter)
-                fneigh = abs(dsort-400)
-                print(diter[fneigh == min(fneigh)])
-                print(diter, min(fneigh))
-                ax.plot(np.log10(dsort), np.log10(diter), label=label_, color=colour_)
-                f.write("\n"+str(label_)+"f(r< "+str(dsort[fneigh==min(fneigh)])+"au) = "+str(diter[fneigh==min(fneigh)]))
-            ax.legend(prop={'size': self.clean_plot.axlabel_size})
-            self.clean_plot.tickers(ax, "plot")
-            fig.savefig(fname, dpi=700, bbox_inches='tight')
-            plt.clf()
+            data_arr = [str_str_arr, str_jmo_arr, jmo_jmo_arr]
+            label_arr = ["Star-Star", "Star-JMO", "JMO-JMO"]
+            colours_arr = ["Black", "Red", "Blue"]
+
+            diter = 0
+            with open(os.path.join("plotters/figures/system_evolution/two_point_corr"+str(self.models[model_iter])+"_jmo.txt"), 'w') as f: 
+                f.write("Data for "+str(self.models[model_iter]))
+                for data_, label_, colour_ in zip(data_arr, label_arr, colours_arr):
+                    dsort = np.sort(data_)
+                    diter = np.asarray([i for i in enumerate(dsort)])
+                    diter = diter[:,0]
+                    diter /= max(diter)
+                    fneigh = abs(dsort-400)
+                    if miter == 0:
+                        ax.plot(np.log10(dsort), np.log10(diter), label=label_, 
+                                color=colour_, linestyle=lstyle[miter])
+                    else:
+                        ax.plot(np.log10(dsort), np.log10(diter), 
+                                color=colour_, linestyle=lstyle[miter])
+                    f.write("\n"+str(label_)+"f(r< "+str(dsort[fneigh==min(fneigh)])+"au) = "+str(diter[fneigh==min(fneigh)]))
+            miter += 1
+        ax.legend(prop={'size': self.clean_plot.axlabel_size}, loc=4)
+        self.clean_plot.tickers(ax, "plot")
+        fig.savefig(fname, dpi=700, bbox_inches='tight')
+        plt.clf()
