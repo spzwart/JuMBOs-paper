@@ -710,7 +710,7 @@ class FinalInitialProperties(object):
                 mass1 = self.fin_bmass[model_iter][idx_][0]*self.mratio
                 mass2 = self.fin_bmass[model_iter][idx_][1]*self.mratio
                 max_mass, min_mass, q = self.bin_mass_property(mass1, mass2)
-                if max_mass <= self.JuMBO_max_mass.value_in(units.MJupiter):
+                if max_mass <= self.Star_min_mass.value_in(units.MJupiter):
                     fin_q.append(q)
                     fin_pmass.append(max_mass)
                     fin_smass.append(min_mass)
@@ -726,7 +726,7 @@ class FinalInitialProperties(object):
                 mass1 = self.fin_bmass[model_iter][syst_][0]*self.mratio
                 mass2 = self.fin_bmass[model_iter][syst_][1]*self.mratio
                 max_mass, min_mass, q = self.bin_mass_property(mass1, mass2)
-                if max_mass <= self.JuMBO_max_mass.value_in(units.MJupiter):
+                if max_mass <= self.Star_min_mass.value_in(units.MJupiter):
                     fin_q.append(q)
                     fin_pmass.append(max_mass)
                     fin_smass.append(min_mass)

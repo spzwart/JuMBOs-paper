@@ -6,10 +6,10 @@ read_data = ReadData()
 bin_plot = FinalInitialProperties()
 
 
-model_choices = [[0,1,2], [0,8,9], [3,4,5], [1,7], [1,10], [6]]
+"""model_choices = [[0,1,2], [0,8,9], [3,4,5], [1,7], [1,10], [6]]
 for models_ in model_choices:
     print("Time Evol for ", models_)
-    bin_plot.time_evol_nJumbo(models_)
+    bin_plot.time_evol_nJumbo(models_)"""
 
 time_crop = [False, True]
 for crop_ in time_crop:
