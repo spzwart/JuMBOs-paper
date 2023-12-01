@@ -1,0 +1,11 @@
+Orbital parameter: m
+Model Fractal_rvir0.5 vs Plummer_rvir0.5
+KS value: KstestResult(statistic=0.1282566371681416, pvalue=1.1606192095170442e-06)
+
+Median Fractal_rvir0.5: 131.91800884
+IQR Fractal_rvir0.5: 89.0261631414, 162.883349096
+
+Median Plummer_rvir0.5: 189.638939792
+IQR Plummer_rvir0.5: 112.756777463, 217.211009662
+
+

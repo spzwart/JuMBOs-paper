@@ -1,4 +1,4 @@
-Orbital parameter: sem_axis
+Orbital parameter: e
 Model Fractal_rvir0.5 vs Fractal_rvir0.5_FF_10Myr
 KS value: KstestResult(statistic=0.17422755142106375, pvalue=2.1362506430477879e-08)
 

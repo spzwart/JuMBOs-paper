@@ -588,7 +588,7 @@ class FinalInitialProperties(object):
         fig, ax = plt.subplots()
         ax.plot(obs_sort, obs_iter, color="black", 
                 linewidth=2.5, label="Observation")
-        labels, plot_labels, extra_str = self.clean_plot.model_layout(model_choices)
+        labels, extra_str = self.clean_plot.model_layout(model_choices)
         if (dt_crop):
             fname = "plotters/figures/binary_evolution/"+str(extra_str)+"mprim_crop.pdf"
         else:
@@ -888,7 +888,7 @@ class FinalInitialProperties(object):
         xlabel=[r'$e$', r'$a$ [au]', r'$r_{ij}$ [au]']
         ylabel=[r'$f_{<e}$', r'$f_{<a}$', r'$f_{<r_{ij}}$']
         file_name = ["eccentricity", "sem_axis", "proj_sep"]
-        leg_txt, plot_label, extra_str = self.clean_plot.model_layout(model_choices)
+        leg_txt, extra_str = self.clean_plot.model_layout(model_choices)
 
         citer = 0            
         iparams = [[ ], [ ], [ ], [ ]]
@@ -989,7 +989,16 @@ class FinalInitialProperties(object):
                                 if fparams[k_][plot_][idx_] > 25:
                                     fin_jmb_cropped.append(fparams[k_][plot_][idx_])
                                     nsamples_cropped[run_idx] += 1
-                        
+                
+                if file_name[plot_] == "sem_axis":
+                    if self.models[model_choices[k_]] == "Fractal_rvir0.5" \
+                        or self.models[model_choices[k_]] == "Fractal_rvir0.5_FF"  \
+                            or self.models[model_choices[k_]] == "Plummer_rvir0.5" \
+                                or self.models[model_choices[k_]] == "Plummer_rvir0.5_FF":
+                        file_name = "semi_major_"+str(self.models[model_choices[k_]])+".h5"
+                        LG_array = pd.DataFrame(fin_jmb)
+                        LG_array.to_hdf(os.path.join(file_name), key="dF", mode='w')
+
                 fsort, fpop = self.plot_func.cdf_plotter(fin_jmb)
                 if file_name[plot_] == "proj_sep":
                     fsorta, fpopa = self.plot_func.cdf_plotter(fin_jmb_sem)
@@ -1072,7 +1081,7 @@ class FinalInitialProperties(object):
     def time_evol_nJumbo(self, model_choices):
         """Plot evolution of nJuMBO in time"""
 
-        leg_txt, plot_label, extra_str = self.clean_plot.model_layout(model_choices)
+        leg_txt, extra_str = self.clean_plot.model_layout(model_choices)
         fig, ax = plt.subplots()
 
         fiter = 0
@@ -1188,7 +1197,7 @@ class FinalInitialProperties(object):
            dt_crop:    Boolean to investigate final snapshot, or when fJuMBO = 9%
         """
 
-        leg_txt, plot_label, extra_str = self.clean_plot.model_layout(model_choices)
+        leg_txt, extra_str = self.clean_plot.model_layout(model_choices)
         miter = 0
         lstyle = ["-", "-."]
 

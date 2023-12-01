@@ -1,0 +1,11 @@
+Orbital parameter: m
+Model Fractal_rvir0.5_FF vs Fractal_rvir0.5_FFOnly
+KS value: KstestResult(statistic=0.615141187925998, pvalue=4.7240874147647105e-05)
+
+Median Fractal_rvir0.5_FF: 30.2346221863
+IQR Fractal_rvir0.5_FF: 15.8278825488, 43.2257120407
+
+Median Fractal_rvir0.5_FFOnly: 196.752238316
+IQR Fractal_rvir0.5_FFOnly: 113.597749279, 70.190352027
+
+

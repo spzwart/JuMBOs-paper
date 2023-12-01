@@ -1,0 +1,11 @@
+Orbital parameter: m
+Model Plummer_rvir0.5 vs Plummer_rvir1.0
+KS value: KstestResult(statistic=0.14882341853047668, pvalue=2.4424906541753444e-15)
+
+Median Plummer_rvir0.5: 233.247536708
+IQR Plummer_rvir0.5: 136.926829734, 234.459638882
+
+Median Plummer_rvir1.0: 343.948058432
+IQR Plummer_rvir1.0: 187.755030038, 270.857845823
+
+

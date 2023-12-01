@@ -6,10 +6,10 @@ read_data = ReadData()
 bin_plot = FinalInitialProperties()
 
 
-"""model_choices = [[0,1,2], [0,8,9], [3,4,5], [1,7], [1,10], [6]]
+model_choices = [[0,1,2], [0,8,9], [3,4,5], [1,7], [1,10], [6]]
 for models_ in model_choices:
     print("Time Evol for ", models_)
-    bin_plot.time_evol_nJumbo(models_)"""
+    bin_plot.time_evol_nJumbo(models_)
 
 time_crop = [False, True]
 for crop_ in time_crop:
@@ -41,6 +41,8 @@ for crop_ in time_crop:
             print("Processing pop stats and mass params for ", bin_plot.models[model_])
             bin_plot.population_statistics(model_, crop_)
             bin_plot.mass_params(model_, crop_)
+        models = [[0,3], [1,4], [2,5]]
+        for model_ in models:
             bin_plot.two_point_correlation(model_, crop_)
         
     else:

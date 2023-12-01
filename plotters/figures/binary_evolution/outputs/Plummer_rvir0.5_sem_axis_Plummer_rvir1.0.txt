@@ -1,4 +1,4 @@
-Orbital parameter: sem_axis
+Orbital parameter: e
 Model Plummer_rvir0.5 vs Plummer_rvir1.0
 KS value: KstestResult(statistic=0.1638446773333441, pvalue=2.4424906541753444e-15)
 
