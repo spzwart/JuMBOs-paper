@@ -420,13 +420,13 @@ FFC:    \includegraphics[width=0.3\columnwidth]{figures/Model_FFC.pdf}
 SPP:    ~\includegraphics[width=0.25\columnwidth,angle=90]{figures/Model_PP.pdf}\\
 SPM:    \includegraphics[width=0.25\columnwidth]{figures/Model_PM.pdf}
 ISF:    ~\includegraphics[width=0.3\columnwidth]{figures/Model_SF_FFC.pdf}
-\caption{Illustration of the four configurations for Jupiter-mass
-  planets in the stellar cluster.  Stars are represented with yellow
-  bullets, and planets in red.  From top left to bottom right we have
-  (as indicated): model ${\cal FFC}$ for the free-floating single
-  planets; ${\cal SPP}$ for outer orbiting planets; ${\cal SPM}$ as
-  bound planet-moon pair orbiting a star, and model ${\cal ISF}$ in
-  situ formation of jumbos.}
+\caption{Illustration of the four configurations for JMOs in the
+  stellar cluster.  Stars are represented with yellow bullets, and
+  JMOs in red.  From top left to bottom right we have (as
+  indicated): model ${\cal FFC}$ for the free-floating single planets;
+  ${\cal SPP}$ for outer orbiting planets; ${\cal SPM}$ as bound
+  planet-moon pair orbiting a star, and model ${\cal ISF}$ in situ
+  formation of jumbos.}
 \label{Fig:models}
 \end{center}
 \end{figure}
@@ -459,15 +459,15 @@ Although incorporating stellar evolution, general relativity and the
 Galactic tidal field would be straightforward in the AMUSE framework,
 we decided to ignore those processes.  We do not expect any stars to
 effectively lose much mass during the short duration of the
-simulations. Meanwhile, incorporating general relativity would have made the
-calculations expensive without much astrophysical gain, and the tidal
-field hardly has any influence on the close encounter dynamics in the
-cluster central portion.  On the other hand, in the observations,
-\jumbos\, seem to be confined towards the cluster's central region.
-However, this is in part an observational selection effect. Namely, it is
-difficult to identify JMOs away from the cluster center due to intercluster 
-extinction and the lower coverage at the periphery (S.\, Pearson, 
-private communication).
+simulations. Meanwhile, incorporating general relativity would have
+made the calculations expensive without much astrophysical gain, and
+the tidal field hardly has any influence on the close encounter
+dynamics in the cluster central portion.  Moreover, in the
+observations, \jumbos\, seem to be confined towards the cluster's
+central region.  However, this is in part an observational selection
+effect. Namely, it is difficult to identify JMOs away from the cluster
+center due to intercluster extinction and the lower coverage at the
+periphery (S.\, Pearson, private communication).
 
 \subsection{Finding \jumbos}
 
@@ -489,12 +489,12 @@ this method we do not establish \jumbos\, as bound objects, but as
 close pairs. This second method mimics observations, in which
 boundness cannot yet be established.
 
-We recognize single stars $s$, and planets $p$. Pairs of
-objects are then placed in parenthesis, for binary stars we write
-$(s,s)$, a planetary system with one planet can be $(s,p)$.  A system
-with two planets then either becomes $((s,p),p)$, for a hierarchy of
-planets, or $(s,(p,p))$ for a planet-pair orbiting a star as in the
-${\cal SPM}$ model. A \jumbo\, in this nomenclature becomes $(p,p)$.
+We denote single stars $s$, and planets $p$. Pairs of objects are then
+placed in parenthesis, for binary stars we write $(s,s)$, a planetary
+system with one planet can be $(s,p)$.  A system with two planets then
+either becomes $((s,p),p)$, for a hierarchy of planets, or $(s,(p,p))$
+for a planet-pair orbiting a star as in the ${\cal SPM}$ model. A
+\jumbo\, in this nomenclature becomes $(p,p)$.
 
 \section{Results}\label{Sect:Results}
 
@@ -515,8 +515,8 @@ The results of these simulations are reported in
 section\,\ref{sect:model_selection}, and in the
 tables\,\ref{Tab:model_numbers} and \ref{Tab:orbital_distributions} in
 section\,\ref{sect:finetuningbinary_fraction}. Section\,\ref{sect:ISF_explored}
-consists of further exploration of our favorite model, one in which
-\jumbo\, form as isolated pairs together with JMOs and stars.
+further explores our favorite model, one in which \jumbos\, form as
+isolated pairs together with JMOs and stars.
 
 \subsection{Distinguishing between the various models}\label{sect:model_selection}
 
@@ -625,8 +625,7 @@ distribution for the mutual distance between stars and JMOs does not
 show such a pronounced shoulder.  Even so, at distances $r_{ij} \apgt
 10^4$\,au both distributions converge.  We note that the more violent
 nature of fractal distributions is also shown here, with a larger
-proportion of $\lesssim10^{3}$\,au detections no matter the
-demographic of the paired objects.
+proportion of $\lesssim10^{3}$\,au detections for all curves.
 
 \begin{figure}
     \centering
@@ -643,7 +642,7 @@ Having established the existence of an overpopulation of nearest
 neigbors among stars and JMOs, we further explore the orbital
 characteristics of the surviving \jumbos.  Table
 \ref{Tab:orbital_distributions} lists the median, the 25\% and 75\%
-quartiles for the JuMBO, (p,p), distribution in primary mass,
+quartiles for the JuMBO, $(p,p)$, distribution in primary mass,
 secondary mass, semi-major axis and eccentricity. The table omits
 models that produce too few \jumbos\, to calculate the median and
 quartiles. We compare observations to the medial values, citing the
@@ -656,7 +655,7 @@ and the upper quartiles.
   \caption{Simulation results for the models that produce a
     sufficiently large population of \jumbos\, to be considered
     feasible (mainly models ${\cal SPM}$ and ${\cal ISF}$). We present
-    the median values and the quartile inter values for 25\,\% and
+    the median values and the quartile intervals for 25\,\% and
     75\,\%.  The observed median inter-JMO distance in the Trapezium
     cluster is $r_{ij} = 193.8^{+78.2}_{-114.1}$\,au $M_{\rm prim} =
     3.67^{+1.31}_{-1.57}$\,\MJup, and $M_{\rm sec} =
@@ -665,7 +664,7 @@ and the upper quartiles.
  \centering 
  \begin{tabular}{llllll}
  \hline\hline
-model&$\langle M \rangle$/\MJup & $\langle m \rangle$/\MJup & $\langle a \rangle$/au & $\langle e \rangle$ \\
+model&$\langle M_{\rm prim} \rangle$/\MJup & $\langle M_{\rm sec} \rangle$/\MJup & $\langle a \rangle$/au & $\langle e \rangle$ \\
  \hline \vspace{-0.75em} \\ 
  ${\cal SPM}$\_Pl\_R025 & $3.62^{+1.36}_{-2.68}$ & $1.12^{+0.24}_{-2.14}$ & $99.08^{+37.24}_{-36.38}$ & $0.47^{+0.18}_{-0.13}$ \vspace{0.25em}\\
  ${\cal SPM}$\_Pl\_R050 & $4.02^{+2.10}_{-3.71}$ & $1.74^{+0.73}_{-0.93}$ & $94.28^{+32.78}_{-78.90}$ & $0.33^{+0.19}_{-0.27}$ \vspace{0.25em}\\  
@@ -692,7 +691,7 @@ separation (or projected distance) the best model seems to be ${\cal
   ISF}$ Plummer with a 0.5\,pc virial radius, but the distributions
 are wide, and although the 1\,pc ${\cal ISF}$ fractal model exhibits a
 low formation rate, it does reproduce the observed separation
-distribution. Note that models ${\cal ISF}$\_Fr at an age of
+distribution. Meanwhile, models ${\cal ISF}$\_Fr at an age of
 $\sim50$\,kyr to $\sim0.2$ Myr compare quite favourably to the
 observations (see section\,\ref{Sect:Disc:finetuning}) and could hint
 at the idea of \jumbos\ forming later in the cluster evolution when
@@ -707,7 +706,7 @@ in the Plummer models, this does not happen.  In model ${\cal ISF}$,
 difference in eccentricity between the Plummer and fractal models is
 less pronounced. Later, in section\,\ref{sect:ISF_explored}, we also
 explore ${\cal ISF}$ models with initially circular orbits, and models
-including a population of free-floating (JMO) objects.
+including a population of free-floating JMOs alongside the \jumbos\,.
 
 \subsection{Stellar and planetary collisions}\label{Sect:collisions}
 
@@ -725,11 +724,11 @@ Plummer models typically yield fewer collisions.  The only Plummer
 models in which collisions among stars were common is in model ${\cal
   FFC}$ with 64, 20 and 18 collisions on average per cluster, for
 those models with a viral radius of 0.25\,pc, 0.5\,pc and 1.0\,pc,
-respectively.  Interestingly, the fractal models from the same
-series and virial radii only experience 30, 17 and 14 collisions.  
-It came as a bit of a surprise that models ${\cal FFC}$\_Pl
-lead to so many collisions, even though no collisions happen between
-two JMOs (this holds for all scenarios investigated in the paper).
+respectively.  Interestingly, the fractal models from the same series
+and virial radii only experience 30, 17 and 14 collisions.  It came as
+a bit of a surprise that models ${\cal FFC}$\_Pl lead to so many
+collisions, throughout the investigation, no JMO-JMO collisions
+occured.
 
 \begin{figure}
 \centering
@@ -805,14 +804,16 @@ Note how quickly the distribution for model ${\cal
 distribution is much narrower and typically has a smaller mean than the 
 observed properties.
 
+++++
 \begin{figure}
   \centering
         \includegraphics[width=0.75\columnwidth]{figures/Fractal_GenObs_sem_evol.pdf}
         \caption{Evolution of the median orbital separation and the
           20\% and 75\% quartiles of the distribution for different
-          fractal runs.  Fr\_050 looks at the case where \jumbos\ are
-          initialised with $0\leq a$ [pc]$\leq 1000$ while Fr\_050O
-          and Fr\_050OC reduce the range to $0\leq a$ [pc]$\leq
+          fractal runs.  Model ${\cal ISF}$\_Fr\_050 looks at the case
+          where \jumbos\ are initialised with $0\leq a$ [pc]$\leq
+          1000$ while ${\cal ISF}$\_Fr\_050O and ${\cal
+            ISF}$\_Fr\_050OC reduce the range to $0\leq a$ [pc]$\leq
           400$. In addition, Fr\_050OC considers initially circular
           JuMBOs, with eccentricities ranging between $0\leq e\leq
           0.2$. }
@@ -854,9 +855,14 @@ the Trapezium cluster.
 \begin{figure}
     \centering
     \includegraphics[width=\columnwidth]{figures/Fractal_General_sem_axis_crop.pdf}
-    \caption{
-    The cumulative distribution function of JuMBO semi-major axis at simulation snapshots where $f_{\mathrm{JuMBO}}\equiv{N_{\mathrm{JuMBO}}}/{N_{\mathrm{JMO}}}$ is nearest to $0.09$. For Fr\_050 and Fr\_050FF this corresponds to $\sim 50$ kyr while for Fr\_100 this is $\sim0.2$ Myr. In all cases, JuMBOs were initialised with a semi-major axis taken from a flat distribution ranging between $0\leq a$ [au] $\leq 1000$.
-    }
+    \caption{ The cumulative distribution function of JuMBO semi-major
+      axis at simulation snapshots where
+      $f_{\mathrm{JuMBO}}\equiv{N_{\mathrm{JuMBO}}}/{N_{\mathrm{JMO}}}$
+      is nearest to $0.09$. For ${\cal ISF}$\_Fr\_050 and ${\cal
+        ISF}$\_Fr\_050FF this corresponds to $\sim 50$ kyr while for
+      ${\cal ISF}$\_Fr\_100 this is $\sim0.2$ Myr. In all cases,
+      JuMBOs were initialised with a semi-major axis taken from a flat
+      distribution ranging between $0\leq a$ [au] $\leq 1000$.  }
         \label{Fig:sma_vs_time_model_ISF_FrA}
 \end{figure}
 
@@ -932,9 +938,10 @@ slope of $\alpha_{\jumbo} =-1.2$ (as was the case for ${\cal PPM}$ and
 ${\cal SPM}$) and with a thermalised mass ratio.  It would be
 relatively straightforward to acquire a satisfactory comparison
 between simulations and observations if we start the simulations with
-a population of \jumbos\, that reflects the observations. Given this,
-we focus mostly on fractal runs since these models have a natural way
-of trimming the wide JuMBO population.
+a population of \jumbos\, that reflects the observations.
+Since \jumbos\, in Plummer models only marginally evolve, here we
+focus mostly on fractal runs which exhibits a natural way of trimming
+the wide JuMBO population.
       
 \begin{table*}
          \caption{Statistics on the surviving \jumbos. $\langle
@@ -1030,11 +1037,11 @@ further formation through interactions with JMOs.
     \includegraphics[width=0.49\columnwidth]{figures/Fractal_rvir0.5_FF_mass_distr.pdf}
     \caption{Probability distribution of primary mass versus mass
       ratio for the simulated \jumbos\, in model ${\cal
-        ISF}$\_Pl\_R050ff.  The red crosses show the
-      observed \jumbos.  The primary masses for these runs ware
-      generated from a uniform distribution, which is still evident in
-      the Plummer model (left), but in the fractal model the initial
-      conditions are lost.  }
+        ISF}$\_Pl\_R050ff (left) and ${\cal ISF}$\_Fr\_R050ff (right)
+      The red crosses show the observed \jumbos.  The primary masses
+      for these runs ware generated from a uniform distribution, which
+      is still evident in the Plummer model (left), but in the fractal
+      model the initial conditions are lost.  }
          \label{Fig:Gen_mdistr_Plummer}
          \label{Fig:Gen_mdistr_Fractal}
 \end{figure}
@@ -1042,7 +1049,7 @@ further formation through interactions with JMOs.
 In figure\,\ref{Fig:Gen_mdistr_Plummer} we present the probability
 distribution of primary \jumbo\, mass and mass ratio, $q$, for Plummer
 and fractal models.  The observed points (red) seem to cover a similar
-parameter space, but overall distribution does not seem to be
+parameter space, but the overall distribution does not seem to be
 consistent with the observations. For the Plummer models this is, in
 principle, relatively simple to resolve, by using the observed
 distribution as input. For the fractal models such fine-tuning will be
@@ -1066,8 +1073,7 @@ population (data from \,\cite{2023arXiv231001231P}).
       (colors). The red bullet points indicate the high mass-ratio
       population, whereas the blue bullets show the low-mass ratio
       population.  The dotted curve separating the two populations
-      equals $10^3au/(M_{\rm prim}(1+q))$ as indicated.
-      }
+      equals $10^3{\rm au}/(M_{\rm prim}(1+q))$ as indicated.  }
     \label{Fig:obs_q_mprim_sep}
 \end{figure}
 
@@ -1077,18 +1083,19 @@ which represents a separation between the high-mass ratio (red) and
 the low-mass ratio (blue) population. We empirically draw this curve
 which follows
 \begin{equation}
-  S(M_{\rm prim}) = 10^3 au {1 \MJup \over M_{\rm prim}(1+q)}.
+  S(M_{\rm prim}) = 10^3 {\rm au} {1 \MJup \over M_{\rm prim}(1+q)}.
 \end{equation}
-Here we adopted a distribution in $q$ ranging from 1.0 to 0.2
+
+Here we adopted a distribution in $q$ ranging from $0.2$ to $1.0$
 following a thermal distribution such that the lowest mass primary has
-an equal-mass secondary, and a ratio of 0.2 for the most massive
-primary The dotted curve seems to separate high-mass ratio \jumbos\,
-from the low mass-ratio cases. One interpretation for this curve is
+an equal-mass secondary, and a ratio of $0.2$ for the most massive
+primary. The dotted curve seems to separate high-mass ratio JuMBOs
+from the low mass-ratio cases.  One interpretation for this curve is
 related to the binding energy, which is proportional to the total
-\jumbo\, mass and inversely proportional to orbital separation.  The
+JuMBO mass and inversely proportional to orbital separation.  The
 dotted curve then represents a constant binding energy for a $\sim
-4.7$\,\MJup\,Q mass objects in a $a=1000$\,au orbit around a
-1\,\MSun\, star. Or equivalently, two 10\,\MJup\, objects in a 25\,au
+4.7$\, \MJup mass objects in a $a = 1000$\,au orbit around a
+$1$\,\MSun star. Or equivalently, two $10$\MJup objects in a $25$\,au
 orbit.
 
 We could continue calibrating the initial conditions for a more
@@ -1102,17 +1109,16 @@ rather sharply at about 400\,au.
 
 In figure \ref{Fig:Mdistr_F05} we show the primary mass function of
 the surviving \jumbos\, for two models ${\cal ISF}$\_Fr\_R050.  The
-initial distribution is presented as a solid curve, and the final (after
-1\,Myr) as the dashed curve. The two adopted initial primary mass
-functions were flat (red) and a power-law with an exponent of $\alpha=-1.2$. The difference between the initial and final
-mass primary function is minimal; one tends to lose some objects in
-the low-mass end, causing the curve to become flatter, and
-the mean mass to increase. 
-Although the global trends are similar, the steeper mass function
-leads to a better comparison with the observations.  We do not present
-mass functions from the other simulations, because the trends are essentially 
-equivalent, once more highlighting that \jumbos\ are prone to
-ionisation no matter with whom they interact.
+black curves are the initial distributions. Coloured lines of the same
+linestyle represent the corresponding final distribution.  The
+difference between the initial and final mass primary function is
+minimal; one tends to lose some objects in the low-mass end, causing
+the curve to become flatter, and the mean mass to increase.  Although
+the global trends are similar, the steeper mass function leads to a
+better comparison with the observations.  We do not present mass
+functions from the other simulations, because the trends are
+essentially equivalent, once more highlighting that \jumbos\ are prone
+to ionisation no matter with whom they interact.
 
 \begin{figure}
     \centering
@@ -1146,24 +1152,24 @@ wide pairs can survive.
 
 An alternative explanation for the large population of pairs among the
 free-floating JMOs might be that they form late.  If \jumbos\, only
-formed after $\sim 0.2$\,Myr, they have a better chance to survive in
+formed after $\sim 0.2$\,Myr, they have a better chance of surviving in
 the harsh cluster dynamical environment.  Such a late formation would
 hardly affect the estimated mass of the objects, because the cooling
 curves used to estimate their mass from the observed temperature and
 luminosity are roughly flat at such a young age
 \cite{2000MNRAS.314..858L}.
 
-The binary fraction continues to drop well after 0.2\,Myr, and by the
-time the cluster is 1\,Myr old only $\sim 4$ of the binaries in the
-fractal models survive. The survival fraction in the Plummer models is
-considerably higher. The fraction of \jumbo\, continues to drop, and
-by the time the cluster is $\sim 10$\,Myr the fraction of \jumbos\ is
-$\aplt 2$\,\%.  Interestingly enough, \cite{2022NatAs...6...89M},
-reported the detection of 70 to 170 single JMOs in Upper Scorpius,
-which has an age of about 10\,Myr.  None of the objects in Upper
-Scorpius is paired, although this observation could be biased in terms
-of missing close pairs due to relatively low resolution of the
-observations.  
+The binary fraction continues to drop well after 0.2\,Myr for all
+models, and by the time the cluster is 1\,Myr old only $\sim 4$\% of the
+binaries in the fractal models survive. The survival fraction in the
+Plummer models is considerably higher. The fraction of \jumbo\,
+continues to drop, and by the time the cluster is $\sim 10$\,Myr the
+fraction of \jumbos\ is $\aplt 2$\,\%.  Interestingly enough,
+\cite{2022NatAs...6...89M}, reported the detection of 70 to 170 single
+JMOs in Upper Scorpius, which has an age of about 10\,Myr.  None of
+the objects in Upper Scorpius is paired, although this observation
+could be biased in terms of missing close pairs due to relatively low
+resolution of the observations.
 
 Our calculations did not include primordial stellar binaries (or
 higher order systems), nor did we take the effect of stellar evolution
@@ -1394,7 +1400,7 @@ to still reflect the initial conditions.
       denote observed \jumbos.  In this model, the initial mass
       function and mass-ratio distributions for the \jumbos\, were
       skewed to lower mass primaries ($\alpha = -1.2$), and to equal
-      mass systems ($q$ between 0.2 and 1.0 sampled from a thermal
+      mass systems ($0.2\leq q\leq 1.0$, sampled from a thermal
       distribution).  }
          \label{Fig:FractalObs_mdistr}
    \end{figure}
@@ -1415,10 +1421,10 @@ that have recently fostered them.
     \includegraphics[width=0.75\columnwidth]{figures/Fractal_rvir0.5_FF_sem_ecc_mixed_systs.pdf}
     \caption{Contours of constant density for semi-major axis and
       eccentricities for JMO-stellar systems for model
-      $\mathcal{ISF}$\_Fr\_050ff. These systems are surprisingly common in
-      our simulations, and they even tend to be relatively tight. The
-      actual orbits remain dynamically soft, though. }
-         \label{Fig:MixedSys_OrbParams}
+      $\mathcal{ISF}$\_Fr\_050ff. These systems are surprisingly
+      common in our simulations, and they even tend to be relatively
+      tight, though the actual orbits remain dynamically soft.  }
+    \label{Fig:MixedSys_OrbParams}
    \end{figure}
 
 Our slight preference for the fractal models stems from their natural
@@ -1438,20 +1444,21 @@ conditions versus dynamical evolution and emergence.
 
 \subsection{Assessment on the origin of \jumbos}
 
-In the ${\cal ISF}$ Plummer models, $\sim 61$\% of the \jumbos\, are
-ionized within 1\,Myr, compared to $\sim 96$\,\% for the fractal
-models.  The observed population of free-floaters and \jumbos\, can
-then be reproduced if the cluster was born with half of its population of JMOs
+In the ${\cal ISF}$ Plummer models, depending on the clusters
+configuration, $\sim 50\%-70$\% of the \jumbos\, are ionized within
+1\,Myr, compared to $\sim 96$\,\% for the fractal models.  The
+observed population of free-floaters and \jumbos\, can then be
+reproduced if the cluster was born with half of its population of JMOs
 as free-floaters and the other half as pairs.  The current observed
-primary and secondary masses of \jumbos\, would reflect the
-conditions at birth, while the semi-major axis and eccentricity
-distributions would have been affected considerably by encounters with
-other cluster members. These processes tend to drive the eccentricity
-distribution to resemble the thermal distribution (probably with an
-excess of $\apgt 0.7$ eccentricities
-\cite{2000IJoMP...15..4871P}). The semi-major axes of the \jumbos\ would
-have widened, on average by approximately 5\% due to encounters with
-free-floating planet-mass objects.
+primary and secondary masses of \jumbos\, would reflect the conditions
+at birth, while the semi-major axis and eccentricity distributions
+would have been affected considerably by encounters with other cluster
+members. These processes tend to drive the eccentricity distribution
+to resemble the thermal distribution (probably with an excess of
+$\apgt 0.7$ eccentricities \cite{2000IJoMP...15..4871P}). The
+semi-major axes of the \jumbos\ would have widened, on average by
+approximately 5\% due to encounters with free-floating planet-mass
+objects.
 
 Alternative to a Plummer initial stellar distribution we consider
 fractal distributions, which are also able to satisfactorily reproduce
@@ -1465,7 +1472,7 @@ separations with a maximum of $\sim 400$\,au.  Higher order
 multiplicity (JuMTOs and JuMQOs) form naturally from interactions between
 two or more \jumbos\, in the fractal models.
 
-This model (${\cal ISF}$\_Pl\_R050) satisfactorily explains the
+This model (${\cal ISF}$\_Fr\_R050) satisfactorily explains the
 observed orbital separation distribution, with a $\sim 15$\% excess of
 systems with a separation $\apgt 400$\,au. We do not expect a rich
 population of orbits with separation smaller than the observed
@@ -1508,7 +1515,7 @@ them to preserve their orbital characteristics.
 
 In table\,\ref{Tab:late_formed_jumbos} we present a small experiment
 to support the argument of \jumbos\, forming late.  The table shows the
-fraction of surviving jumbos, and their orbital parameters. We omitted
+fraction of surviving \jumbos, and their orbital parameters. We omitted
 the eccentricities, as they are consistent with the thermal
 distributon.
 
@@ -1519,9 +1526,7 @@ moments in time, we stop the run, and restart it with \jumbos\, and
 JMOs.  Each restart is initialized with 300\,\jumbos\, and 600\,JMOs.
 The \jumbos\, are taken from the same distribution functions for
 primary mass, secondary mass and orbital parameters from the models
-${\cal ISF}$, except that we introduce a maximum orbital separation of
-400\,au, rather than the 1000\,au in the runs described in
-section\,\ref{Sect:Model}.
+${\cal ISF}$; Their maximum orbital separation is 400 au.
 
 \begin{table}
   \caption{Final distribution of fraction of \jumbos\, and orbital
@@ -1535,7 +1540,8 @@ section\,\ref{Sect:Model}.
  \centering 
  \begin{tabular}{lrrrrrrrrrrrr}
    \hline\hline
- $t_{\rm birth}$/Myr & $f_{(p,p)}$  & $\langle M \rangle$/\MJup & $\langle m \rangle$/\MJup & $\langle a \rangle$/au \\
+ $t_{\rm birth}$/Myr & $f_{(p,p)}$  & $\langle M_{\rm
+  prim} \rangle$/\MJup & $\langle M_{\rm sec} \rangle$/\MJup & $\langle a \rangle$/au \\
  0.0 & 0.05 &  $8.12^{+3.44}_{-4.51}$ & $2.10^{+0.98}_{-1.66}$ & $112.06^{+40.76}_{-181.76}$ \\
  0.1 & 0.15 &  $5.50^{+2.59}_{-3.54}$ & $2.13^{+1.11}_{-1.26}$ & $156.10^{+81.76}_{-95.45}$ \\
  0.2 & 0.22 &  $5.22^{+2.36}_{-3.37}$ & $1.53^{+0.61}_{-1.15}$ & $191.55^{+90.23}_{-91.63}$\\
@@ -1550,10 +1556,13 @@ It should not come as a suprise that the fraction of surviving
 \jumbos\, increases when they form later. We illustate this further in
 figure\,\ref{Fig:survival_fraction_ISF_late_foramtion}, where we plot
 the surviving fraction of \jumbos\, as a function of the time they
-were introduced in the simulation. We started introducing them at the
+were introduced in the simulation.  We started introducing them at the
 same time as the stars (left, $t_{\rm birth} = 0$\,Myr), and as last
 point they were introduced together with the stars (right most point
-at $t_{\rm birth} = 1$\,Myr).
+at $t_{\rm birth} = 1$\,Myr).  The left-most point essentially
+replicates our earlier ${\cal ISF}$\_Fr configurations, and the
+rigght-most point reflects the initial conditions.
+
 
 \begin{figure}
     \centering
@@ -1635,12 +1644,12 @@ lead to thermalized distributions ($e\apgt 0.6$).
 
 For model ${\cal SPM}$ to produce a sufficient number of \jumbos\, it
 requires planet-moon pairs to form in $\apgt 900$\,au orbits around
-their parent star. Such wide orbits are exotic considering the fact
-that the circum-stellar disks observed in the Trapezium cluster tend
-to be smaller than 400\,au. We therefore do not see how such wide
+their parent star. Such wide orbits are exotic since the
+circum-stellar disks observed in the Trapezium cluster tend to be
+smaller than 400\,au. We therefore do not see how such wide
 planet-moon pairs can form around stars. If, however, a popultion of
-cold $a\apgt 100$\,au jupiters are found in the Trapezium cluster, we
-do consider this model a serious candidate for producing \jumbos.
+cold $a\apgt 100$\,au JMOs are found in the Trapezium cluster, we do
+consider this model a serious candidate for producing \jumbos.
 Investigating some of the observed \jumbos\ in the images published in
 \cite{2023arXiv231001231P}, we get the impression that some \jumbos\,
 may have nearby stars, but a thorough statistical study to confirm
