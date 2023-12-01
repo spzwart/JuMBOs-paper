@@ -1,0 +1,63 @@
+%%
+% Journal abbreviations:
+%%
+\def\aa{\ {A\&A}\ }
+\def\aap{\ {A\&A}\ }
+\def\aapr{\ {A\&A Review}\ }
+\def\aarev{\ {A\&A Review}\ }
+\def\aas{\ {A\&AS}\ }
+\def\aaps{\ {A\&AS}\ }
+\def\acta{\ {Acta Astron.}\ }
+\def\actaa{\ {Acta Astron.}\ }
+\def\advspres{\ {Adv. Space Res.}\ }
+\def\aj{\ {AJ}\ }
+\def\ajp{\ {Aust. J. Phys.}\ }
+\def\ajpas{\ {Aust. J. Phys. Astr. Supp.}\ }
+\def\annap{\ {Ann. d'Ap.}\ }
+\def\apj{\ {ApJ}\ }
+\def\apjl{\ {ApJL}\ }
+\def\apjs{\ {ApJS}\ }
+\def\apss{\ {Ap\&SS}\ }
+\def\araa{\ {ARA\&A}\ }
+\def\astrolett{\ {Astro. Lett. and Communications}\ }
+\def\baas{\ {BAAS}\ }
+\def\ban{\ {BAN}\ }
+\def\bain{\ {Bul. Astron. Inst. Neth.}\ }
+\def\cntphys{\ {Contemp. Phys.}\ }
+\def\currsci{\ {Curr. Sci.}\ }
+\def\GeoRL{\ {Geoph. R. L.}\ }
+\def\icarus{\ {Icarus}\ }
+\def\iaucirc{\ {IAU circular}\ }
+\def\jaa{\ {JA\&A}\ }
+\def\jgr{\ {Journal of Geophysical Research}\ }
+\def\jphys{\ {J. de Physique}\ }
+\def\memsai{\ {Mem. Soc. Astron. Ital.}\ }
+\def\mess{\ {Messenger}\ }
+\def\mnras{\ {MNRAS}\ }
+\def\nar{\ {New Astron. Review}\ }
+\def\nat{\ {Nat}\ }
+\def\natps{\ {Nature Phys. Sci.}\ }
+\def\newa{\ {New Astron.}\ }
+\def\na{\ {New Astron.}\ }
+\def\obs{\ {Observatory}\ }
+\def\pasa{\ {Proc. Astron. Soc. Aust.}\ }
+\def\pasp{\ {PASP}\ }
+\def\pasj{\ {Publ. Astr. Soc. Japan}\ }
+\def\pcps{\ {Proc. Cambridge Phil. Soc.}\ }
+\def\pddo{\ {Pub. David Dunlap Obs.}\ }
+\def\philtrans{\ {Phil. Trans. R. Soc. London A}\ }
+\def\physrep{\ {PhysRep}\ }
+\def\physrevl{\ {Phys. Rev. Lett.}\ }
+\def\physscrip{\ {Physica Scripta}\ }
+\def\phystod{\ {Physics Today}\ }
+\def\pnas{\ {Proc. Nat. Acad. Sci.}\ }
+\def\prd{\ {Phys. Rev. D.}\ }
+\def\qjras{\ {QJRAS}\ }
+\def\rmxaa{\ {Revista Mexicana de Astronomia y Astrofisica}\ }
+\def\roa{\ {R. Obs. Annals}\ }
+\def\rob{\ {R. Obs. Bull.}\ }
+\def\sci{\ {Science}\ }
+\def\sovast{\ {SvA}\ }
+\def\ssr{\ {Space Sci. Rev.}\ }
+\def\zfa{\ {Zeitschr. f. Astroph.}\ }
+\def\zeiss{\ {Zeiss Inform. with Jena Rev.}\ }
