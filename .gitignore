@@ -7,3 +7,5 @@ data/Simulation_Data/*
 data/*
 plotters/figures/system_evolution/output_movie/*
 *.pdf
+.vscode/*
+.gitignore
